@@ -1,0 +1,22 @@
+{
+  "name": "mini-marketplace-full-stack",
+  "version": "1.0.0",
+  "main": "github-import_2.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thamys/mini-marketplace-full-stack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thamys/mini-marketplace-full-stack/issues"
+  },
+  "homepage": "https://github.com/thamys/mini-marketplace-full-stack#readme",
+  "description": "",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
