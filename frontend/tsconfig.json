@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "outDir": ".next"
   },
   "include": [
     "next-env.d.ts",
