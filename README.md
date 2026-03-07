@@ -7,6 +7,14 @@ O repositório é divido em:
 - `/frontend` (Next.js 16 + Tailwind CSS)
 - `/backend` (NestJS + Prisma + PostgreSQL)
 
+## 🛠️ Ferramentas e Decisões Técnicas
+
+- **Node.js**: `v22.x`
+- **Gerenciador de Pacotes**: `npm` (utilizando _NPM Workspaces_ para orquestração do monorepo e resolução unificada de dependências na raiz, substituindo a ideia inicial do pnpm).
+- **Frontend Framework**: Next.js (App Router escolhido pela performance e renderização híbrida).
+- **Backend Framework**: NestJS (escolhido pela sua arquitetura modular out-of-the-box e tipagem forte) via Node API.
+- **Banco de Dados**: PostgreSQL + Prisma ORM.
+
 ## 🏁 Épicos e Roadmap do Projeto
 
 O desenvolvimento deste mini-marketplace está estruturado em **5 épicos principais**, guiando da infraestrutura inicial até o deploy e qualidade final em produção:
