@@ -19,7 +19,9 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@generated/prisma": ["./generated/prisma/client.ts"],
+      "@generated/prisma/*": ["./generated/prisma/*"]
     }
   }
 }
