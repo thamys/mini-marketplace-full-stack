@@ -13,7 +13,13 @@
     "start": "pnpm -r start",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "db:format": "pnpm -C backend exec prisma format",
+    "db:migrate": "pnpm -C backend exec prisma migrate dev",
+    "db:generate": "pnpm -C backend exec prisma generate",
+    "db:studio": "pnpm -C backend exec prisma studio",
+    "db:reset": "pnpm -C backend exec prisma migrate reset",
+    "db:deploy": "pnpm -C backend exec prisma migrate deploy"
   },
   "repository": {
     "type": "git",
