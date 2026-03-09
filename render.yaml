@@ -4,8 +4,9 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: "npm install --include=dev && npm run build"
-    startCommand: "npx prisma migrate deploy && npx prisma db seed && npm run start:prod"
+    buildCommand: "npm install -g pnpm && pnpm install && pnpm run build"
+    startCommand: "npx prisma migrate deploy && npx prisma db seed && pnpm run start:prod"
+    healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -13,14 +14,16 @@ services:
           property: connectionString
       - key: NODE_ENV
         value: production
+      - key: JWT_SECRET
+        generateValue: true
 
   - type: web
     name: marketplace-frontend
     env: node
     plan: free
     rootDir: frontend
-    buildCommand: "npm install --include=dev && npm run build"
-    startCommand: "npm start"
+    buildCommand: "npm install -g pnpm && pnpm install && pnpm run build"
+    startCommand: "pnpm run start"
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
