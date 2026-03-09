@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: marketplace-backend
+    env: node
+    buildCommand: "pnpm install && pnpm --filter backend exec prisma generate && pnpm --filter backend run build"
+    startCommand: "cd backend && npx prisma migrate deploy && npx prisma db seed && npm run start:prod"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: marketplace-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: marketplace-frontend
+    env: node
+    buildCommand: "pnpm install && pnpm --filter frontend run build"
+    startCommand: "cd frontend && npm start"
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: marketplace-backend
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: NODE_ENV
+        value: production
+
+databases:
+  - name: marketplace-db
+    databaseName: marketplace
+    user: user
