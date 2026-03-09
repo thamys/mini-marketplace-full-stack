@@ -2,6 +2,7 @@ services:
   - type: web
     name: marketplace-backend
     env: node
+    plan: free
     buildCommand: "pnpm install && pnpm --filter backend exec prisma generate && pnpm --filter backend run build"
     startCommand: "cd backend && npx prisma migrate deploy && npx prisma db seed && npm run start:prod"
     envVars:
@@ -15,6 +16,7 @@ services:
   - type: web
     name: marketplace-frontend
     env: node
+    plan: free
     buildCommand: "pnpm install && pnpm --filter frontend run build"
     startCommand: "cd frontend && npm start"
     envVars:
@@ -28,5 +30,6 @@ services:
 
 databases:
   - name: marketplace-db
+    plan: free
     databaseName: marketplace
     user: user
