@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRepository } from './users.repository';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@generated/prisma';
+import { User } from '@prisma/client';
 
 type MockPrismaService = {
   user: {
