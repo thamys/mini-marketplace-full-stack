@@ -10,13 +10,14 @@ test.describe('Authentication Flow - Standardized', () => {
   });
 
   test('TC-01: Successful login - Should display success toast and redirect to home', async ({ page }) => {
-    const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJhZG1pbkBtYXJrZXRwbGFjZS5jb20iLCJyb2xlIjoiQURNSU4ifQ.signature";
+    const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJhZG1pbkBtYXJrZXRwbGFjZS5jb20iLCJyZWFsX25hbWUiOiJBZG1pbiIsIm5hbWUiOiJBZG1pbiIsInJvbGUiOiJBRE1JTiJ9.signature";
+    const mockUser = { id: '1', email: 'admin@marketplace.com', name: 'Admin', role: 'ADMIN' };
     
     await page.route(`${BASE_URL}/auth/login`, async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ token: mockToken })
+        body: JSON.stringify({ access_token: mockToken, user: mockUser })
       });
     });
 
@@ -27,7 +28,7 @@ test.describe('Authentication Flow - Standardized', () => {
       } else {
         await route.fulfill({ 
           status: 200, 
-          body: JSON.stringify({ authenticated: true, token: mockToken }) 
+          body: JSON.stringify({ authenticated: true, user: mockUser }) 
         });
       }
     });
@@ -48,7 +49,7 @@ test.describe('Authentication Flow - Standardized', () => {
       await route.fulfill({
         status: 401,
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Unauthorized' })
+        body: JSON.stringify({ message: 'Invalid credentials' })
       });
     });
 
@@ -58,17 +59,18 @@ test.describe('Authentication Flow - Standardized', () => {
 
     const errorAlert = page.locator('[data-testid="login-error"]');
     await expect(errorAlert).toBeVisible();
-    await expect(errorAlert).toContainText('Email ou senha incorretos');
+    await expect(errorAlert).toContainText('Invalid credentials');
   });
 
   test('TC-03: Route Protection - Authenticated user should be redirected from login/register to home', async ({ page }) => {
     const dummyJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwicm9sZSI6IkNVU1RPTUVSIn0.signature";
+    const dummyUser = { id: '1', email: 'test@example.com', name: 'Test User', role: 'CUSTOMER' };
     
-    // Mock session as authenticated (for Client-side state if needed)
+    // Mock session as authenticated
     await page.route('**/api/auth/session', async route => {
       await route.fulfill({ 
         status: 200, 
-        body: JSON.stringify({ authenticated: true, token: dummyJwt }) 
+        body: JSON.stringify({ authenticated: true, user: dummyUser }) 
       });
     });
 
@@ -87,9 +89,11 @@ test.describe('Authentication Flow - Standardized', () => {
   });
 
   test('TC-04: Navigation - Should navigate between login and register pages', async ({ page }) => {
-    await page.click('text=Cadastre-se');
+    // Check for "Cadastrar-se" instead of "Cadastre-se" to match current UI
+    await page.click('text=Cadastrar-se');
     await expect(page).toHaveURL('/register');
 
+    // Wait for the register page to load and find the link back to login
     await page.click('text=Entre aqui');
     await expect(page).toHaveURL('/login');
   });

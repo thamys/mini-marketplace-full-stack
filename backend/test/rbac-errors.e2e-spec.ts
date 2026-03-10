@@ -24,20 +24,26 @@ describe('RBAC and JWT Errors (e2e)', () => {
 
   describe('JWT Error Messages', () => {
     it('should return 401 "Token not provided" when no token is sent', async () => {
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .get('/auth/me')
         .expect(401);
-      
-      expect(response.body.message).toBe('Token not provided');
+
+      const body = response.body as unknown as { message: string };
+      expect(body.message).toBe('Token not provided');
     });
 
     it('should return 401 "Invalid token" when a malformed token is sent', async () => {
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .get('/auth/me')
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
-      
-      expect(response.body.message).toBe('Invalid token');
+
+      const body = response.body as unknown as { message: string };
+      expect(body.message).toBe('Invalid token');
     });
 
     it('should return 401 "Token expired" when an expired token is sent', async () => {
@@ -46,36 +52,53 @@ describe('RBAC and JWT Errors (e2e)', () => {
         { expiresIn: '-1h' },
       );
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .get('/auth/me')
         .set('Authorization', `Bearer ${expiredToken}`)
         .expect(401);
-      
-      expect(response.body.message).toBe('Token expired');
+
+      const body = response.body as unknown as { message: string };
+      expect(body.message).toBe('Token expired');
     });
   });
 
   describe('RolesGuard (RBAC)', () => {
     it('should return 403 "Access denied: insufficient role" for CUSTOMER accessing admin route', async () => {
-      const customerToken = jwtService.sign({ sub: '123', email: 'test@test.com', role: 'CUSTOMER' });
+      const customerToken = jwtService.sign({
+        sub: '123',
+        email: 'test@test.com',
+        role: 'CUSTOMER',
+      });
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .get('/auth/admin-test')
         .set('Authorization', `Bearer ${customerToken}`)
         .expect(403);
-      
-      expect(response.body.message).toBe('Access denied: insufficient role');
+
+      const body = response.body as unknown as { message: string };
+      expect(body.message).toBe('Access denied: insufficient role');
     });
 
     it('should allow access to admin route for ADMIN user', async () => {
-      const adminToken = jwtService.sign({ sub: '456', email: 'admin@test.com', role: 'ADMIN' });
+      const adminToken = jwtService.sign({
+        sub: '456',
+        email: 'admin@test.com',
+        role: 'ADMIN',
+      });
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .get('/auth/admin-test')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
-      
-      expect(response.body.message).toBe('Admin access granted');
+
+      const body = response.body as unknown as { message: string };
+      expect(body.message).toBe('Admin access granted');
     });
   });
 });

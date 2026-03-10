@@ -40,13 +40,17 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getProfile(
-    @Request() req: { user: { userId: string; email: string; role: string } },
+    @Request()
+    req: {
+      user: { userId: string; email: string; name: string; role: string };
+    },
   ) {
     // We return a structured object to avoid direct coupling with prisma models
     // and ensure no sensitive data is leaked even if req.user expands in the future.
     return {
       id: req.user.userId,
       email: req.user.email,
+      name: req.user.name,
       role: req.user.role,
     };
   }

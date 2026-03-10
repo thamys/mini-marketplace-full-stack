@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -31,7 +31,7 @@ const registerSchema = z.object({
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<RegisterValues>({
@@ -50,9 +50,9 @@ export default function RegisterPage() {
       const response = await api.post('/auth/register', values);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      await login(data.access_token, data.user);
       toast.success('Cadastro realizado com sucesso!');
-      router.push('/');
     },
     onError: (error: Error & { status?: number }) => {
       if (error.status === 409) {

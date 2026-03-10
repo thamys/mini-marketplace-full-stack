@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000/api';
 
 export async function POST(request: Request) {
   try {
@@ -38,5 +41,27 @@ export async function GET() {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  return NextResponse.json({ authenticated: true, token });
+  try {
+    // Call backend /auth/me to get fresh user data
+    const response = await axios.get(`${BACKEND_URL}/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return NextResponse.json({
+      authenticated: true,
+      user: response.data,
+    });
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: unknown; status?: number }; message: string };
+    console.error('Error fetching user profile in session route:', axiosError.response?.data || axiosError.message);
+    
+    // If token is invalid or expired, clear the cookie
+    if (axiosError.response?.status === 401) {
+       cookieStore.delete('auth_token');
+    }
+
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  }
 }

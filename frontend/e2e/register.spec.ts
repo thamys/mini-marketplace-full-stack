@@ -13,7 +13,10 @@ test.describe('Register Page E2E', () => {
       await route.fulfill({ 
         status: 201, 
         contentType: 'application/json',
-        body: JSON.stringify({ id: 1, name: 'Test User', email: 'test@example.com' }) 
+        body: JSON.stringify({ 
+          access_token: 'mock-token', 
+          user: { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' } 
+        }) 
       });
     });
 

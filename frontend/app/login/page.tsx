@@ -2,24 +2,37 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginSchema, type LoginDto } from '@/lib/validations/auth'; // I'll create this file next
+import { LoginSchema, type LoginDto } from '@/lib/validations/auth';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-import { useMutation } from '@tanstack/react-query';
-
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const { login } = useAuth();
-  
+
   const form = useForm<LoginDto>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -28,21 +41,20 @@ export default function LoginPage() {
     },
   });
 
+  const { errors } = form.formState;
+
   const mutation = useMutation({
     mutationFn: async (data: LoginDto) => {
       const response = await api.post('/auth/login', data);
       return response.data;
     },
     onSuccess: async (data) => {
+      await login(data.access_token, data.user);
       toast.success('Login realizado com sucesso!');
-      await login(data.token);
     },
-    onError: (err: unknown) => {
-      if (err && typeof err === 'object' && 'status' in err && err.status === 401) {
-        setServerError('Email ou senha incorretos');
-      } else {
-        setServerError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
-      }
+    onError: (error: Error) => {
+      setServerError(error.message);
+      toast.error('Ocorreu um erro');
     },
   });
 
@@ -52,52 +64,68 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold flex justify-center">Marketplace</CardTitle>
           <CardDescription>Entre com suas credenciais para acessar o marketplace</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {serverError && (
-              <Alert variant="destructive" data-testid="login-error">
-                <AlertDescription>{serverError}</AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="exemplo@email.com"
-                {...form.register('email')}
-              />
-              {form.formState.errors.email && (
-                <p className="text-sm text-red-500 font-medium">{form.formState.errors.email.message}</p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {serverError && (
+                <Alert variant="destructive" data-testid="login-error">
+                  <AlertDescription>{serverError}</AlertDescription>
+                </Alert>
               )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                {...form.register('password')}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="email"
+                        placeholder="seu@email.com"
+                        {...field}
+                        className={errors.email ? 'border-destructive' : ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {form.formState.errors.password && (
-                <p className="text-sm text-red-500 font-medium">{form.formState.errors.password.message}</p>
-              )}
-            </div>
-            <Button type="submit" className="w-full" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="******"
+                        {...field}
+                        className={errors.password ? 'border-destructive' : ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={mutation.isPending}>
+                {mutation.isPending ? 'Entrando...' : 'Entrar'}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600">
             Não tem uma conta?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              Cadastre-se
+            <Link href="/register" className="text-primary hover:underline font-medium">
+              Cadastrar-se
             </Link>
           </p>
         </CardFooter>

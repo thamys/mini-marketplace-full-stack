@@ -32,10 +32,22 @@ export class AuthService {
       role: Role.CUSTOMER,
     });
 
-    return {
-      id: user.id,
+    const payload = {
+      sub: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      expiresIn: '24h',
     };
   }
 
@@ -58,11 +70,17 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
+      name: user.name,
       role: user.role,
     };
 
     return {
-      token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
       expiresIn: '24h',
     };
   }
