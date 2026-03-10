@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRepository } from './users.repository';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { User, Role } from '@prisma/client';
 
 type MockPrismaService = {
   user: {
@@ -50,6 +50,8 @@ describe('UserRepository', () => {
         id: '1',
         email: 'test@example.com',
         name: 'Test',
+        passwordHash: 'hashed_password',
+        role: Role.CUSTOMER,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -73,10 +75,16 @@ describe('UserRepository', () => {
 
   describe('createUser', () => {
     it('should create and return a new user', async () => {
-      const mockInput = { email: 'new@example.com', name: 'New User' };
+      const mockInput = { 
+        email: 'new@example.com', 
+        name: 'New User',
+        passwordHash: 'hashed_password'
+      };
       const mockCreatedUser: User = {
         id: '2',
         ...mockInput,
+        passwordHash: 'hashed_password',
+        role: Role.CUSTOMER,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

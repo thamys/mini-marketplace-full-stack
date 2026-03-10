@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prisma:studio": "prisma studio",
     "postinstall": "prisma generate",
     "start": "nest start",
     "dev": "nest start --watch",
@@ -29,8 +30,11 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.19.2",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
