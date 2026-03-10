@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
@@ -22,42 +22,41 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 
 
+import { useQuery } from '@tanstack/react-query';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const restoreSession = async () => {
-    try {
-      const response = await axios.get('/api/auth/session');
-      if (response.data.authenticated && response.data.token) {
-        try {
+  const { isLoading: loading } = useQuery({
+    queryKey: ['auth-session'],
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/api/auth/session');
+        if (response.data.authenticated && response.data.token) {
           const decoded = jwtDecode<{ sub: string; email: string; role: string }>(response.data.token);
-          setUser({
+          const userData = {
             id: decoded.sub,
             email: decoded.email,
             role: decoded.role,
-          });
-        } catch (decodeError) {
-          console.error('Invalid token found in session:', decodeError);
-          await axios.delete('/api/auth/session');
-          setUser(null);
+          };
+          setUser(userData);
+          return userData;
         }
+      } catch {
+        setUser(null);
+        return null;
       }
-    } catch {
       setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    restoreSession();
-  }, []);
+      return null;
+    },
+    staleTime: Infinity, // The session is only checked on mount or explicit invalidate
+    retry: false,
+  });
 
 
 
-  const login = async (token: string) => {
+  const login = React.useCallback(async (token: string) => {
     await axios.post('/api/auth/session', { token });
     const decoded = jwtDecode<{ sub: string; email: string; role: string }>(token);
     setUser({
@@ -66,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role: decoded.role,
     });
     router.push('/');
-  };
+  }, [router]);
 
   const logout = React.useCallback(async () => {
     await axios.delete('/api/auth/session');
@@ -74,9 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     router.push('/login');
   }, [router]);
 
-  const stableLogin = React.useCallback(login, [router]);
-
-  const value = React.useMemo(() => ({ user, loading, login: stableLogin, logout }), [user, loading, stableLogin, logout]);
+  const value = React.useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
 
   return (
     <AuthContext.Provider value={value}>

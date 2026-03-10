@@ -39,6 +39,12 @@ export class AuthController {
   getProfile(
     @Request() req: { user: { userId: string; email: string; role: string } },
   ) {
-    return req.user;
+    // We return a structured object to avoid direct coupling with prisma models
+    // and ensure no sensitive data is leaked even if req.user expands in the future.
+    return {
+      id: req.user.userId,
+      email: req.user.email,
+      role: req.user.role,
+    };
   }
 }

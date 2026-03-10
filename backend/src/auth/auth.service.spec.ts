@@ -73,8 +73,12 @@ describe('AuthService', () => {
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(
         registerDto.email,
       );
-      expect(userRepository).toHaveProperty('createUser');
-      expect(userRepository.createUser).toHaveBeenCalled();
+      expect(userRepository.createUser).toHaveBeenCalledWith({
+        email: registerDto.email,
+        name: registerDto.name,
+        passwordHash: 'hashed_password',
+        role: Role.CUSTOMER,
+      });
       expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
     });
 
