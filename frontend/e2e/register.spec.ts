@@ -3,21 +3,38 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Register Page E2E', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log(`BROWSER CONSOLE: [${msg.type()}] ${msg.text()}`));
+    // Clear cookies for a clean state
+    await page.context().clearCookies();
     await page.goto('/register');
     await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
   });
 
   test('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
+    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' };
+
     await page.route('**/auth/register', async route => {
       await route.fulfill({ 
         status: 201, 
         contentType: 'application/json',
         body: JSON.stringify({ 
           access_token: 'mock-token', 
-          user: { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' } 
+          user: mockUser 
         }) 
       });
+    });
+
+    // Mock the session check for the redirection logic after registration
+    // This prevents a 401 console error when the page redirects to "/"
+    await page.route('**/api/auth/session', async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({ 
+          status: 200, 
+          contentType: 'application/json',
+          body: JSON.stringify({ authenticated: true, user: mockUser }) 
+        });
+      } else if (route.request().method() === 'POST') {
+        await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
+      }
     });
 
     await page.getByPlaceholder('Seu nome').fill('Test User');
@@ -58,4 +75,3 @@ test.describe('Register Page E2E', () => {
     await expect(page.locator('body')).toContainText('A senha deve ter pelo menos 8 caracteres', { timeout: 10000 });
   });
 });
-
