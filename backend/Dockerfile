@@ -36,8 +36,8 @@ RUN npm install -g prisma@^6.0.0
 RUN prisma generate --schema=backend/prisma/schema.prisma
 
 # Copy built application
-COPY --from=builder /app/backend/dist ./dist
+COPY --from=builder /app/backend/dist ./backend/dist
 
 # Entrypoint setup
 EXPOSE 4000
-CMD prisma migrate deploy && prisma db seed && node dist/main.js
+CMD prisma migrate deploy && prisma db seed && node backend/dist/main.js
