@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 test.describe('Register Page E2E', () => {
   test.beforeEach(async ({ page }) => {
@@ -9,8 +8,8 @@ test.describe('Register Page E2E', () => {
     await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
   });
 
-  test('Successful Registration - Toast and Redirect', async ({ page }) => {
-    await page.route(`${BASE_URL}/auth/register`, async route => {
+  test('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
+    await page.route('**/auth/register', async route => {
       await route.fulfill({ 
         status: 201, 
         contentType: 'application/json',
@@ -30,8 +29,8 @@ test.describe('Register Page E2E', () => {
     await page.waitForURL('**/', { timeout: 10000 });
   });
 
-  test('Error Treatment - Email already registered (409)', async ({ page }) => {
-    await page.route(`${BASE_URL}/auth/register`, async route => {
+  test('TC-06: Error Treatment - Should display toast for already registered email (409)', async ({ page }) => {
+    await page.route('**/auth/register', async route => {
       await route.fulfill({ 
         status: 409, 
         contentType: 'application/json',
@@ -48,7 +47,7 @@ test.describe('Register Page E2E', () => {
     await expect(page.locator('body')).toContainText('Este email já está cadastrado', { timeout: 10000 });
   });
 
-  test('Client-side Validation - Zod errors', async ({ page }) => {
+  test('TC-07: Client-side Validation - Should display Zod validation errors', async ({ page }) => {
     await page.getByRole('button', { name: /Criar conta/i }).click();
 
     await expect(page.locator('body')).toContainText('O nome deve ter pelo menos 2 caracteres', { timeout: 10000 });
