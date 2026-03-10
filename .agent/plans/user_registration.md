@@ -6,7 +6,7 @@ This plan outlines the steps to implement user registration, allowing new users 
 
 > [!IMPORTANT]
 >
-> - **Architecture**: I've chosen the **Service Layer** approach (`Controller -> Service -> Repository`). While `Controller -> Repository` is faster for simple apps, the Service Layer keeps business logic (like hashing and existance checks) separate from HTTP handling, making it easier to test and scale.
+> - **Architecture**: I've chosen the **Service Layer** approach (`Controller -> Service -> Repository`). While `Controller -> Repository` is faster for simple apps, the Service Layer keeps business logic (like hashing and existence checks) separate from HTTP handling, making it easier to test and scale.
 > - **Libraries**:
 >   - **Form Management**: `react-hook-form` + `zod` (standard for performance and validation).
 >   - **Server State**: `@tanstack/react-query` (ideal for handling async requests, loading states, and caching).
@@ -56,7 +56,7 @@ This plan outlines the steps to implement user registration, allowing new users 
 ### Backend Test Scenarios (Jest / Supertest)
 
 - ** AuthService Unit Tests**:
-  - `register()` sucessful with valid data.
+  - `register()` successful with valid data.
   - `register()` throws `ConflictException` for existing email.
   - `register()` calls `bcrypt.hash` with correct cost (10).
 - **Controller E2E Tests**:
@@ -81,6 +81,6 @@ This plan outlines the steps to implement user registration, allowing new users 
 ### Manual Verification
 
 1. Start backend and frontend services.
-2. Navigate to `http://localhost:3001/register`.
+2. Navigate to `http://localhost:3000/register`.
 3. Try scenarios above (validation, duplicate, success).
 4. Verify database: `SELECT * FROM "User"` shows hashed password and not plain text.

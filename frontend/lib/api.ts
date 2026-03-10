@@ -16,7 +16,7 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message?: string }>) => {
     const customError = new Error(
-      error.response?.data?.message || error.message || 'Ocorreu um erro inesperado'
+      error.response?.data?.message || error.message || 'An unexpected error occurred'
     ) as Error & { status?: number };
     
     customError.status = error.response?.status; 
