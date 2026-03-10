@@ -75,10 +75,10 @@ describe('UserRepository', () => {
 
   describe('createUser', () => {
     it('should create and return a new user', async () => {
-      const mockInput = { 
-        email: 'new@example.com', 
+      const mockInput = {
+        email: 'new@example.com',
         name: 'New User',
-        passwordHash: 'hashed_password'
+        passwordHash: 'hashed_password',
       };
       const mockCreatedUser: User = {
         id: '2',

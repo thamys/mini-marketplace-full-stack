@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserRepository } from '../users/users.repository';
 import { ConflictException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 
 describe('AuthService', () => {
@@ -48,7 +47,7 @@ describe('AuthService', () => {
         role: Role.CUSTOMER,
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as any);
+      });
 
       const result = await service.register(registerDto);
 
@@ -57,17 +56,29 @@ describe('AuthService', () => {
         email: registerDto.email,
         name: registerDto.name,
       });
-      expect(userRepository.findUserByEmail).toHaveBeenCalledWith(registerDto.email);
-      expect(userRepository.createUser).toHaveBeenCalled();
-      
+      expect(userRepository.findUserByEmail.mock.calls[0][0]).toBe(
+        registerDto.email,
+      );
+      expect(userRepository.createUser.mock.calls.length).toBe(1);
+
       const createData = userRepository.createUser.mock.calls[0][0];
       expect(createData.passwordHash).toMatch(/^\$2b\$10\$/);
     });
 
     it('should throw ConflictException if user already exists', async () => {
-      userRepository.findUserByEmail.mockResolvedValue({ id: '1' } as any);
+      userRepository.findUserByEmail.mockResolvedValue({
+        id: '1',
+        email: registerDto.email,
+        name: registerDto.name,
+        passwordHash: 'hashed_password',
+        role: Role.CUSTOMER,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      await expect(service.register(registerDto)).rejects.toThrow(ConflictException);
+      await expect(service.register(registerDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 });

@@ -10,7 +10,9 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body(new ZodValidationPipe(RegisterSchema)) registerDto: RegisterDto) {
+  async register(
+    @Body(new ZodValidationPipe(RegisterSchema)) registerDto: RegisterDto,
+  ) {
     return await this.authService.register(registerDto);
   }
 }

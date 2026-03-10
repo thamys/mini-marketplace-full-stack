@@ -34,14 +34,20 @@ describe('AuthController (e2e)', () => {
         password: 'password123',
       };
 
-      const response = await request(app.getHttpServer())
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .post('/auth/register')
         .send(payload)
         .expect(201);
 
       expect(response.body).toHaveProperty('id');
-      expect(response.body.email).toBe(payload.email);
-      expect(response.body.name).toBe(payload.name);
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          email: payload.email,
+          name: payload.name,
+        }),
+      );
       expect(response.body).not.toHaveProperty('passwordHash');
     });
 
@@ -52,7 +58,7 @@ describe('AuthController (e2e)', () => {
         password: 'password123',
       };
 
-      await request(app.getHttpServer())
+      await request(app.getHttpServer() as string | (() => void))
         .post('/auth/register')
         .send(payload)
         .expect(409);
@@ -65,7 +71,7 @@ describe('AuthController (e2e)', () => {
         password: 'short',
       };
 
-      await request(app.getHttpServer())
+      await request(app.getHttpServer() as string | (() => void))
         .post('/auth/register')
         .send(payload)
         .expect(400);
