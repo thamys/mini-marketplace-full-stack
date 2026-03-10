@@ -20,9 +20,11 @@ describe('AuthController (e2e)', () => {
 
   afterAll(async () => {
     // Cleanup test user
-    await prisma.user.deleteMany({
-      where: { email: 'e2e@test.com' },
-    });
+    if (prisma) {
+      await prisma.user.deleteMany({
+        where: { email: 'e2e@test.com' },
+      });
+    }
     await app.close();
   });
 
