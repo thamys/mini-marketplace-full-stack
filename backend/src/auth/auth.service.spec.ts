@@ -63,12 +63,18 @@ describe('AuthService', () => {
         updatedAt: new Date(),
       });
 
+      jwtServiceMock.sign.mockReturnValue('mock_token');
       const result = await service.register(registerDto);
 
       expect(result).toEqual({
-        id: '1',
-        email: registerDto.email,
-        name: registerDto.name,
+        access_token: 'mock_token',
+        expiresIn: '24h',
+        user: {
+          id: '1',
+          email: registerDto.email,
+          name: registerDto.name,
+          role: Role.CUSTOMER,
+        },
       });
       expect(userRepository.findUserByEmail).toHaveBeenCalledWith(
         registerDto.email,
@@ -123,12 +129,18 @@ describe('AuthService', () => {
       const result = await service.login(loginDto);
 
       expect(result).toEqual({
-        token: 'mock_token',
+        access_token: 'mock_token',
+        user: {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.name,
+        },
         expiresIn: '24h',
       });
       expect(jwtServiceMock.sign).toHaveBeenCalledWith({
         sub: mockUser.id,
         email: mockUser.email,
+        name: mockUser.name,
         role: mockUser.role,
       });
       expect(bcrypt.compare).toHaveBeenCalledWith(
