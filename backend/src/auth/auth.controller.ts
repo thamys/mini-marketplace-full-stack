@@ -15,6 +15,9 @@ import { LoginSchema } from './dto/login.dto';
 import type { LoginDto } from './dto/login.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -46,5 +49,12 @@ export class AuthController {
       email: req.user.email,
       role: req.user.role,
     };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('admin-test')
+  adminTest() {
+    return { message: 'Admin access granted' };
   }
 }
