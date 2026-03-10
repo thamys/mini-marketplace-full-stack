@@ -48,7 +48,7 @@ services:
     volumes:
       - /app/frontend/node_modules
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:4000
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
     depends_on:
       - backend
 
