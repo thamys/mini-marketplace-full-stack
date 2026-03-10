@@ -27,7 +27,7 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('/auth/register (POST)', () => {
-    it('should register a new user (201)', async () => {
+    it('TC-E2E-B01: should register a new user (201)', async () => {
       const payload = {
         name: 'E2E User',
         email: 'e2e@test.com',
@@ -51,7 +51,7 @@ describe('AuthController (e2e)', () => {
       expect(response.body).not.toHaveProperty('passwordHash');
     });
 
-    it('should return 409 if email already exists', async () => {
+    it('TC-E2E-B02: should return 409 if email already exists', async () => {
       const payload = {
         name: 'E2E User',
         email: 'e2e@test.com',
@@ -64,7 +64,7 @@ describe('AuthController (e2e)', () => {
         .expect(409);
     });
 
-    it('should return 400 for invalid payload', async () => {
+    it('TC-E2E-B03: should return 400 for invalid payload', async () => {
       const payload = {
         name: 'U', // Too short
         email: 'invalid-email',
