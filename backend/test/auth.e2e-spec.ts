@@ -25,7 +25,9 @@ describe('AuthController (e2e)', () => {
         where: { email: 'e2e@test.com' },
       });
     }
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('/auth/register (POST)', () => {

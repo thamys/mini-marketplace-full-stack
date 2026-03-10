@@ -19,7 +19,9 @@ describe('RBAC and JWT Errors (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('JWT Error Messages', () => {
