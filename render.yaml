@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     rootDir: backend
-    buildCommand: "npm install -g pnpm && pnpm install && pnpm run build"
+    buildCommand: "npm install -g pnpm && pnpm config set side-effects-cache false && pnpm install && pnpm run build"
     startCommand: "npx prisma migrate deploy && npx prisma db seed && pnpm run start:prod"
     healthCheckPath: /api/health
     envVars:
