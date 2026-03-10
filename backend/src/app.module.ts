@@ -9,7 +9,8 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'production' ? undefined : '../.env',
+      envFilePath:
+        process.env.NODE_ENV === 'production' ? undefined : '../.env',
       isGlobal: true,
     }),
     PrismaModule,

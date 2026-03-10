@@ -33,7 +33,8 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(registerSchema as any),
     defaultValues: {
       name: '',
       email: '',

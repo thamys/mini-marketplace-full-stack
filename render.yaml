@@ -23,7 +23,7 @@ services:
     plan: free
     rootDir: frontend
     buildCommand: "npm install -g pnpm && pnpm install && pnpm run build"
-    startCommand: "pnpm run start"
+    startCommand: "node .next/standalone/mini-marketplace-full-stack/frontend/server.js"
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:
