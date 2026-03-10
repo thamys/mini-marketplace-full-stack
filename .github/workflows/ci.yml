@@ -118,25 +118,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [lint-frontend, test-backend]
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: pass
-          POSTGRES_DB: marketplace
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U user -d marketplace"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
-      DATABASE_URL: postgresql://user:pass@localhost:5432/marketplace?schema=public
       NEXT_PUBLIC_API_URL: http://localhost:4000/api
-      JWT_SECRET: super-secret-jwt-key-for-ci
 
     steps:
       - uses: actions/checkout@v4
@@ -153,12 +136,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run migrations
-        working-directory: backend
-        run: pnpm exec prisma migrate deploy
+      - name: Build frontend
+        working-directory: frontend
+        run: pnpm build
 
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: pnpm --filter frontend test:e2e
