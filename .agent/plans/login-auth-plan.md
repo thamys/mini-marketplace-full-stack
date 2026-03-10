@@ -33,6 +33,22 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 - Add `POST /auth/login` endpoint.
 - Add `GET /auth/me` endpoint protected by `JwtAuthGuard` for verification.
 
+#### [MODIFY] [jwt-auth.guard.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/jwt-auth.guard.ts) [NEW US-07]
+
+- Override `handleRequest` to throw specific `UnauthorizedException` with messages:
+  - "Token not provided"
+  - "Invalid token"
+  - "Token expired"
+
+#### [NEW] [roles.decorator.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/roles.decorator.ts) [NEW US-07]
+
+- Create a `@Roles(...roles: string[])` decorator.
+
+#### [NEW] [roles.guard.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/roles.guard.ts) [NEW US-07]
+
+- Implement a guard that checks `user.role` against metadata.
+- Return `403 Forbidden` with "Access denied: insufficient role".
+
 #### [MODIFY] [auth.module.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/auth.module.ts)
 
 - Register `JwtModule` and Passport strategies.
@@ -68,6 +84,19 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 
 - Simple authenticated page to verify route protection.
 
+#### [NEW] [orders/page.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/orders/page.tsx) [NEW US-07]
+
+- Simple placeholder page with title "Meus Pedidos".
+
+#### [NEW] [admin/page.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/admin/page.tsx) [NEW US-07]
+
+- Simple placeholder page with title "Painel Administrativo".
+
+#### [MODIFY] [middleware.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/middleware.ts) [NEW US-07]
+
+- Expand `protectedRoutes` to include `/orders` and `/admin`.
+- Implement RBAC logic using JWT payload.
+
 ## Verification Plan
 
 ### Automated Tests
@@ -82,6 +111,10 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 - **TC-06.5.1**: Authenticated user trying to access `/login` is redirected to `/`.
 - **TC-06.5.2**: Authenticated user trying to access `/register` is redirected to `/`.
 - **TC-06.5.3**: Unauthenticated user trying to access `/profile` (if protected via middleware/context) is redirected to `/login`.
+- **TC-07.1**: Unauthenticated user visits `/orders` -> Redirect to `/login`. [NEW US-07]
+- **TC-07.2**: Unauthenticated user visits `/admin` -> Redirect to `/login`. [NEW US-07]
+- **TC-07.3**: Authenticated `CUSTOMER` user visits `/admin` -> Redirect to `/`. [NEW US-07]
+- **TC-07.4**: Authenticated `ADMIN` user visits `/admin` -> Allowed (200). [NEW US-07]
 - **TC-06.6.1**: Verify links between login and register pages work correctly.
 
 ### Manual Verification
