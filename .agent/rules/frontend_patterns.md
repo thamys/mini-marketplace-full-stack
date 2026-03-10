@@ -2,6 +2,13 @@
 
 Follow these patterns to ensure consistency across the frontend application.
 
+## Gerenciamento de Estado e Requisições
+
+- **TanStack Query (obrigatório)**: Toda e qualquer requisição assíncrona que envolva estado (loading, error, data) **DEVE** utilizar o TanStack Query (`useQuery`, `useMutation`).
+  - **Proibido**: Uso de `useEffect` manual para carregar dados ou estados locais de `loading`/`error` para requisições.
+  - **Motivo**: Centralização de cache, tratamento automático de estados de carregamento e consistência em toda a aplicação.
+  - **Contexto Global**: Até mesmo o `AuthContext` deve utilizar `useQuery` para validar a sessão no mount da aplicação.
+
 ## Form Management
 
 - **TanStack Query**: Use `useMutation` for all form submissions and API mutations. This provides built-in state management for loading, success, and error states.
