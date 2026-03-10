@@ -1,6 +1,6 @@
 # Implementation Plan - Login and Authentication
 
-Implement a secure login system using JWT for the mini-marketplace, including backend authentication logic and a frontend login interface with session management via httpOnly cookies.
+Implement a secure login system using JWT for the mini-marketplace, including backend authentication logic, frontend login interface, session management via httpOnly cookies, and route protection.
 
 ## Proposed Changes
 
@@ -8,7 +8,7 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 
 #### [MODIFY] [package.json](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/package.json)
 
-- Add dependencies: `@nestjs/jwt`.
+- Add dependencies: `@nestjs/jwt`, `@nestjs/passport`, `passport-jwt`.
 
 #### [NEW] [login.dto.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/dto/login.dto.ts)
 
@@ -18,17 +18,24 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 
 - Implement `login(credentials: LoginDto)` method.
 - Verify user existence and password hash using `bcrypt`.
-- Generate JWT using `JwtService` with payload `{ sub: userId, role, email }`.
-- Throw `UnauthorizedException` with generic message for invalid credentials.
+- Generate JWT with payload `{ sub: userId, role, email }`.
+
+#### [NEW] [jwt.strategy.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/jwt.strategy.ts)
+
+- Implement Passport JWT strategy to validate tokens and extract user payload.
+
+#### [NEW] [jwt-auth.guard.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/jwt-auth.guard.ts)
+
+- Create a reusable `JwtAuthGuard`.
 
 #### [MODIFY] [auth.controller.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/auth.controller.ts)
 
 - Add `POST /auth/login` endpoint.
-- Use `ZodValidationPipe` for request validation.
+- Add `GET /auth/me` endpoint protected by `JwtAuthGuard` for verification.
 
 #### [MODIFY] [auth.module.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/backend/src/auth/auth.module.ts)
 
-- Register `JwtModule` with secret and expiration (24h).
+- Register `JwtModule` and Passport strategies.
 
 ---
 
@@ -42,49 +49,43 @@ Implement a secure login system using JWT for the mini-marketplace, including ba
 
 - Create `AuthContext` to manage user state.
 - Implement `login`, `logout`, and session restoration.
-- Use `jwt-decode` to extract user info from the token on the client-side.
+- **Redirection Logic:** Redirect authenticated users away from `/login` and `/register` to `/`.
 
 #### [NEW] [route.ts](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/api/auth/session/route.ts)
 
-- Handle `POST /api/auth/session` to set the `httpOnly` cookie.
-- Handle `DELETE /api/auth/session` to clear the cookie.
+- Handle session storage via `httpOnly` cookie.
 
 #### [NEW] [login/page.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/login/page.tsx)
 
-- Create the login page with a form.
-- Integrate with `AuthContext.login`.
-- Display generic error message on 401.
+- Login form with generic error handling.
+- **Link to Register:** Add a link to the registration page.
 
-#### [MODIFY] [Providers.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/components/Providers.tsx)
+#### [MODIFY] [register/page.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/register/page.tsx)
 
-- Wrap application with `AuthProvider`.
+- **Link to Login:** Add a link to the login page.
+
+#### [NEW] [profile/page.tsx](file:///Users/thamys/Codes/technical-tests/mini-marketplace-full-stack/frontend/app/profile/page.tsx)
+
+- Simple authenticated page to verify route protection.
 
 ## Verification Plan
 
 ### Automated Tests
 
-#### Backend Unit Tests
+#### Backend Unit/Integration
 
-- `pnpm --filter backend test`: Run `auth.service.spec.ts` to verify login logic.
-- **TC-06.1.1**: Valid credentials return token and expiresIn.
-- **TC-06.1.2**: Incorrect password throws `UnauthorizedException`.
-- **TC-06.1.3**: Non-existent email throws `UnauthorizedException`.
+- **TC-06.2.3**: `GET /auth/me` without token returns 401.
+- **TC-06.2.4**: `GET /auth/me` with valid token returns user data.
 
-#### Backend E2E Tests
+#### Frontend E2E (Playwright)
 
-- `pnpm --filter backend test:e2e`: Verify `POST /api/auth/login` returns 200/401 correctly.
-
-#### Frontend E2E Tests
-
-- `pnpm --filter frontend test:e2e`: Create `frontend/e2e/login.spec.ts` to verify:
-  - **TC-06.3.2**: Token is set in `httpOnly` cookie and NOT in `localStorage`.
-  - **TC-06.4.1**: Generic error message on 401.
-  - Successful redirect after login.
+- **TC-06.5.1**: Authenticated user trying to access `/login` is redirected to `/`.
+- **TC-06.5.2**: Authenticated user trying to access `/register` is redirected to `/`.
+- **TC-06.5.3**: Unauthenticated user trying to access `/profile` (if protected via middleware/context) is redirected to `/login`.
+- **TC-06.6.1**: Verify links between login and register pages work correctly.
 
 ### Manual Verification
 
-1. Register a new user via the interface (if available) or via Postman/Seed.
-2. Attempt login with correct credentials.
-3. Verify redirection and user state in the UI.
-4. Attempt login with incorrect password and verify the generic error message.
-5. Check browser dev tools to ensure the cookie is `httpOnly` and `localStorage` is clean.
+1. Log in and attempt to visit `/login` manually via URL; verify redirection to home.
+2. Check navigation links between registration and login forms.
+3. Access `/profile` and verify it displays user info when logged in.
