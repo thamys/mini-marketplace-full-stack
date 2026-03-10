@@ -2,3 +2,5 @@
 node_modules/
 .vscode/
 *.tsbuildinfo
+frontend/playwright-report/
+frontend/test-results/

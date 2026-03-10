@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "db:deploy": "pnpm -C backend exec prisma migrate deploy",
+    "db:studio": "pnpm -C backend exec prisma studio",
     "dev": "concurrently \"pnpm -C frontend dev\" \"pnpm -C backend dev\"",
     "docker:db": "docker compose up postgres -d",
     "docker:prod": "docker compose up --build",

@@ -1,17 +1,56 @@
-version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: marketplace-db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: marketplace
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d marketplace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: ${DOCKER_TARGET:-runner}
+    container_name: marketplace-backend
+    ports:
+      - "4000:4000"
+    working_dir: /app/backend
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/main.js"
+    volumes:
+      - /app/backend/node_modules
+    environment:
+      - DATABASE_URL=postgresql://user:pass@postgres:5432/marketplace?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: runner
+    container_name: marketplace-frontend
+    working_dir: /app/frontend
+    command: sh -c "node server.js"
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/frontend/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
