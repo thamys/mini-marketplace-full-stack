@@ -25,8 +25,16 @@ describe('ProductsController (e2e)', () => {
     jwtService = app.get<JwtService>(JwtService);
 
     // Create a mock user for tokens
-    adminToken = jwtService.sign({ sub: 'admin-id', email: 'admin@test.com', role: Role.ADMIN });
-    customerToken = jwtService.sign({ sub: 'customer-id', email: 'customer@test.com', role: Role.CUSTOMER });
+    adminToken = jwtService.sign({
+      sub: 'admin-id',
+      email: 'admin@test.com',
+      role: Role.ADMIN,
+    });
+    customerToken = jwtService.sign({
+      sub: 'customer-id',
+      email: 'customer@test.com',
+      role: Role.CUSTOMER,
+    });
 
     // Clean up products
     await prisma.product.deleteMany();
@@ -48,7 +56,9 @@ describe('ProductsController (e2e)', () => {
         imageUrl: 'http://test.com/img.jpg',
       };
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .post('/products')
         .set('Authorization', `Bearer ${adminToken}`)
         .send(payload);
@@ -65,13 +75,18 @@ describe('ProductsController (e2e)', () => {
         price: -10,
       };
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .post('/products')
         .set('Authorization', `Bearer ${adminToken}`)
         .send(payload);
 
       expect(response.status).toBe(400);
-      const body = response.body as { message: string, errors: Record<string, string[]> };
+      const body = response.body as {
+        message: string;
+        errors: Record<string, string[]>;
+      };
       expect(body.message).toBe('Validation failed');
       expect(body.errors).toHaveProperty('name');
       expect(body.errors).toHaveProperty('price');
@@ -86,7 +101,9 @@ describe('ProductsController (e2e)', () => {
         stock: 1,
       };
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .post('/products')
         .set('Authorization', `Bearer ${customerToken}`)
         .send(payload);
@@ -109,7 +126,9 @@ describe('ProductsController (e2e)', () => {
 
       const updatePayload = { price: 75 };
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .put(`/products/${product.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send(updatePayload);
@@ -136,13 +155,17 @@ describe('ProductsController (e2e)', () => {
         },
       });
 
-      const response = await request(app.getHttpServer() as string | (() => void))
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
         .delete(`/products/${product.id}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(response.status).toBe(204);
-      
-      const deletedProduct = await prisma.product.findUnique({ where: { id: product.id } });
+
+      const deletedProduct = await prisma.product.findUnique({
+        where: { id: product.id },
+      });
       expect(deletedProduct).toBeNull();
     });
   });

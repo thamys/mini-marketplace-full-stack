@@ -5,6 +5,9 @@ import { NotFoundException } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { Product, Prisma } from '@prisma/client';
 
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 describe('ProductsService', () => {
   let service: ProductsService;
   let prisma: jest.Mocked<PrismaService>;
@@ -57,7 +60,7 @@ describe('ProductsService', () => {
         data: [mockProduct],
         meta: { total: 1, page: 1, limit: 100, totalPages: 1 },
       });
-      expect(prisma.product.findMany).toHaveBeenCalledWith({
+      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith({
         where: {},
         skip: 0,
         take: 100,
@@ -71,7 +74,7 @@ describe('ProductsService', () => {
 
       await service.findAll({ search: 'notebook', page: 1, limit: 100 });
 
-      expect(prisma.product.findMany).toHaveBeenCalledWith(
+      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { name: { contains: 'notebook', mode: 'insensitive' } },
         }),
@@ -84,7 +87,7 @@ describe('ProductsService', () => {
 
       await service.findAll({ category: 'eletronicos', page: 1, limit: 100 });
 
-      expect(prisma.product.findMany).toHaveBeenCalledWith(
+      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { category: 'eletronicos' },
         }),
@@ -97,7 +100,7 @@ describe('ProductsService', () => {
 
       const result = await service.findAll({ page: 2, limit: 5 });
 
-      expect(prisma.product.findMany).toHaveBeenCalledWith(
+      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           skip: 5,
           take: 5,
@@ -129,7 +132,7 @@ describe('ProductsService', () => {
       const result = await service.findById('1');
 
       expect(result).toEqual(mockProduct);
-      expect(prisma.product.findUnique).toHaveBeenCalledWith({
+      expect(prisma.product.findUnique as jest.Mock).toHaveBeenCalledWith({
         where: { id: '1' },
       });
     });
@@ -158,7 +161,7 @@ describe('ProductsService', () => {
       const result = await service.create(dto);
 
       expect(result).toEqual(mockProduct);
-      expect(prisma.product.create).toHaveBeenCalledWith({
+      expect(prisma.product.create as jest.Mock).toHaveBeenCalledWith({
         data: {
           ...dto,
           price: new Prisma.Decimal(100),
@@ -177,7 +180,7 @@ describe('ProductsService', () => {
       const result = await service.update('1', dto);
 
       expect(result.price).toEqual(new Prisma.Decimal(200));
-      expect(prisma.product.update).toHaveBeenCalledWith({
+      expect(prisma.product.update as jest.Mock).toHaveBeenCalledWith({
         where: { id: '1' },
         data: expect.objectContaining({
           price: new Prisma.Decimal(200),
@@ -199,7 +202,7 @@ describe('ProductsService', () => {
 
       await service.delete('1');
 
-      expect(prisma.product.delete).toHaveBeenCalledWith({
+      expect(prisma.product.delete as jest.Mock).toHaveBeenCalledWith({
         where: { id: '1' },
       });
     });
