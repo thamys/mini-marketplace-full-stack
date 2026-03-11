@@ -9,13 +9,18 @@ describe('AuthController (e2e)', () => {
   let prisma: PrismaService;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    try {
+      const moduleFixture: TestingModule = await Test.createTestingModule({
+        imports: [AppModule],
+      }).compile();
 
-    app = moduleFixture.createNestApplication();
-    prisma = moduleFixture.get<PrismaService>(PrismaService);
-    await app.init();
+      app = moduleFixture.createNestApplication();
+      prisma = moduleFixture.get<PrismaService>(PrismaService);
+      await app.init();
+    } catch (error) {
+      console.error('FAILED TO INITIALIZE E2E APP:', error);
+      throw error;
+    }
   });
 
   afterAll(async () => {
