@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, bffApi } from '../api';
 
 export interface Product {
   id: string;
@@ -36,4 +36,18 @@ export async function getProducts(params?: {
 export async function getProductById(id: string): Promise<Product> {
   const { data } = await api.get<Product>(`/products/${id}`);
   return data;
+}
+
+export async function createProduct(product: Omit<Product, 'id' | 'createdAt'>): Promise<Product> {
+  const { data } = await bffApi.post<Product>('/products', product);
+  return data;
+}
+
+export async function updateProduct(id: string, product: Partial<Omit<Product, 'id' | 'createdAt'>>): Promise<Product> {
+  const { data } = await bffApi.put<Product>(`/products/${id}`, product);
+  return data;
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  await bffApi.delete(`/products/${id}`);
 }
