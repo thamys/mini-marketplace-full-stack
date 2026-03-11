@@ -2,11 +2,15 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { getProducts } from '@/lib/api/products';
 import { ProductCard } from '@/components/product-card';
 import { SearchFilters } from '@/components/search-filters';
 import { Pagination } from '@/components/pagination';
+import { CatalogSkeleton } from '@/components/catalog-skeleton';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 function CatalogContent() {
   const searchParams = useSearchParams();
@@ -15,33 +19,14 @@ function CatalogContent() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = 12;
 
-  const { data: result, isLoading: loading, isError } = useQuery({
+  const { data: result } = useSuspenseQuery({
     queryKey: ['products', { search, category, page, limit }],
     queryFn: () => getProducts({ search, category, page, limit }),
-    placeholderData: (previousData) => previousData,
   });
-
-  if (isError) {
-    return (
-      <div className="text-center py-12 text-red-500 font-semibold">
-        Erro ao carregar o catálogo de produtos.
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={`skeleton-${i}`} className="h-80 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-lg border"></div>
-        ))}
-      </div>
-    );
-  }
 
   if (!result || result.data.length === 0) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800">
         <h3 className="text-xl font-medium">Nenhum produto encontrado</h3>
         <p className="text-zinc-500 mt-2">Tente alterar os termos de busca ou categoria.</p>
       </div>
@@ -49,37 +34,62 @@ function CatalogContent() {
   }
 
   return (
-    <>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+    <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,350px))] gap-6 justify-center">
         {result.data.map((product) => (
-          <div key={product.id}>
+          <article key={product.id}>
             <ProductCard product={product} />
-          </div>
+          </article>
         ))}
       </div>
-
       <Pagination totalPages={result.meta.totalPages} currentPage={result.meta.page} />
-    </>
+    </div>
+  );
+}
+
+function ErrorFallback({ resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {
+  return (
+    <div className="text-center py-16 px-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20">
+      <div className="inline-flex items-center justify-center p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+        <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+      </div>
+      <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">Ops! Algo deu errado</h3>
+      <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
+        Não conseguimos carregar o catálogo de produtos no momento. Por favor, tente novamente.
+      </p>
+      <Button 
+        onClick={resetErrorBoundary}
+        variant="destructive"
+        className="gap-2"
+      >
+        <RefreshCcw className="h-4 w-4" />
+        Tentar novamente
+      </Button>
+    </div>
   );
 }
 
 export default function CatalogPage() {
   return (
-    <div className="container mx-auto py-8 px-4 md:px-6">
-      <div className="flex flex-col space-y-6">
+    <main className="container mx-auto py-8 px-4 md:px-6" id="main-content" aria-labelledby="catalog-title">
+      <div className="flex flex-col space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Catálogo de Produtos</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">Catálogo de Produtos</h1>
+          <p className="text-muted-foreground mt-2 text-lg">
             Navegue por nossa seleção de ofertas incríveis.
           </p>
         </div>
 
-        <SearchFilters />
-
-        <Suspense fallback={<div className="h-10 w-full animate-pulse bg-zinc-100 dark:bg-zinc-800 rounded"></div>}>
-          <CatalogContent />
+        <Suspense fallback={<div className="h-[116px] w-full animate-pulse bg-zinc-100 dark:bg-zinc-800 rounded-lg shadow-sm border"></div>}>
+          <SearchFilters />
         </Suspense>
+
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<CatalogSkeleton />}>
+            <CatalogContent />
+          </Suspense>
+        </ErrorBoundary>
       </div>
-    </div>
+    </main>
   );
 }

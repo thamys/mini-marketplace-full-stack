@@ -33,12 +33,18 @@ export function SearchFilters() {
 
   // Debounce search update
   useEffect(() => {
+    // Only update if the search term changed and is different from the URL
+    const params = new URLSearchParams(searchParams.toString());
+    const currentSearch = params.get('search') || '';
+    
+    if (search === currentSearch) return;
+
     const handler = setTimeout(() => {
       handleFilterChange('search', search);
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [search, handleFilterChange]);
+  }, [search, searchParams, handleFilterChange]);
 
 
 
