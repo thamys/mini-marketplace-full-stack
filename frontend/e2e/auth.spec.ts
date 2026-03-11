@@ -59,7 +59,7 @@ test.describe('Authentication Flow - Standardized', () => {
 
     const errorAlert = page.locator('[data-testid="login-error"]');
     await expect(errorAlert).toBeVisible();
-    await expect(errorAlert).toContainText('Invalid credentials');
+    await expect(errorAlert).toContainText('E-mail ou senha incorretos.');
   });
 
   test('TC-03: Route Protection - Authenticated user should be redirected from login/register to home', async ({ page }) => {

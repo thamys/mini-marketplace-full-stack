@@ -54,7 +54,7 @@ test.describe('Register Page E2E', () => {
       await route.fulfill({ 
         status: 409, 
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Este email já está cadastrado' }) 
+        body: JSON.stringify({ message: 'Email already registered' }) 
       });
     });
 
@@ -64,7 +64,7 @@ test.describe('Register Page E2E', () => {
 
     await page.getByRole('button', { name: /Criar conta/i }).click();
 
-    await expect(page.locator('body')).toContainText('Este email já está cadastrado', { timeout: 10000 });
+    await expect(page.locator('body')).toContainText('Este e-mail já está cadastrado.', { timeout: 10000 });
   });
 
   test('TC-07: Client-side Validation - Should display Zod validation errors', async ({ page }) => {
