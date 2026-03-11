@@ -1,21 +1,40 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
 
 test.describe('Register Page E2E', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log(`BROWSER CONSOLE: [${msg.type()}] ${msg.text()}`));
+    // Clear cookies for a clean state
+    await page.context().clearCookies();
     await page.goto('/register');
     await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
   });
 
-  test('Successful Registration - Toast and Redirect', async ({ page }) => {
-    await page.route(`${BASE_URL}/auth/register`, async route => {
+  test('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
+    const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' };
+
+    await page.route('**/auth/register', async route => {
       await route.fulfill({ 
         status: 201, 
         contentType: 'application/json',
-        body: JSON.stringify({ id: 1, name: 'Test User', email: 'test@example.com' }) 
+        body: JSON.stringify({ 
+          access_token: 'mock-token', 
+          user: mockUser 
+        }) 
       });
+    });
+
+    // Mock the session check for the redirection logic after registration
+    // This prevents a 401 console error when the page redirects to "/"
+    await page.route('**/api/auth/session', async route => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({ 
+          status: 200, 
+          contentType: 'application/json',
+          body: JSON.stringify({ authenticated: true, user: mockUser }) 
+        });
+      } else if (route.request().method() === 'POST') {
+        await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
+      }
     });
 
     await page.getByPlaceholder('Seu nome').fill('Test User');
@@ -30,12 +49,12 @@ test.describe('Register Page E2E', () => {
     await page.waitForURL('**/', { timeout: 10000 });
   });
 
-  test('Error Treatment - Email already registered (409)', async ({ page }) => {
-    await page.route(`${BASE_URL}/auth/register`, async route => {
+  test('TC-06: Error Treatment - Should display toast for already registered email (409)', async ({ page }) => {
+    await page.route('**/auth/register', async route => {
       await route.fulfill({ 
         status: 409, 
         contentType: 'application/json',
-        body: JSON.stringify({ message: 'Este email já está cadastrado' }) 
+        body: JSON.stringify({ message: 'Email already registered' }) 
       });
     });
 
@@ -45,10 +64,10 @@ test.describe('Register Page E2E', () => {
 
     await page.getByRole('button', { name: /Criar conta/i }).click();
 
-    await expect(page.locator('body')).toContainText('Este email já está cadastrado', { timeout: 10000 });
+    await expect(page.locator('body')).toContainText('Este e-mail já está cadastrado.', { timeout: 10000 });
   });
 
-  test('Client-side Validation - Zod errors', async ({ page }) => {
+  test('TC-07: Client-side Validation - Should display Zod validation errors', async ({ page }) => {
     await page.getByRole('button', { name: /Criar conta/i }).click();
 
     await expect(page.locator('body')).toContainText('O nome deve ter pelo menos 2 caracteres', { timeout: 10000 });
@@ -56,4 +75,3 @@ test.describe('Register Page E2E', () => {
     await expect(page.locator('body')).toContainText('A senha deve ter pelo menos 8 caracteres', { timeout: 10000 });
   });
 });
-

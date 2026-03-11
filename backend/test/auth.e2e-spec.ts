@@ -20,14 +20,18 @@ describe('AuthController (e2e)', () => {
 
   afterAll(async () => {
     // Cleanup test user
-    await prisma.user.deleteMany({
-      where: { email: 'e2e@test.com' },
-    });
-    await app.close();
+    if (prisma) {
+      await prisma.user.deleteMany({
+        where: { email: 'e2e@test.com' },
+      });
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('/auth/register (POST)', () => {
-    it('should register a new user (201)', async () => {
+    it('TC-E2E-B01: should register a new user (201)', async () => {
       const payload = {
         name: 'E2E User',
         email: 'e2e@test.com',
@@ -41,8 +45,13 @@ describe('AuthController (e2e)', () => {
         .send(payload)
         .expect(201);
 
-      expect(response.body).toHaveProperty('id');
-      expect(response.body).toEqual(
+      const body = response.body as unknown as {
+        access_token: string;
+        user: { id: string; email: string; name: string; role: string };
+      };
+      expect(body.user).toHaveProperty('id');
+      expect(body).toHaveProperty('access_token');
+      expect(body.user).toEqual(
         expect.objectContaining({
           email: payload.email,
           name: payload.name,
@@ -51,7 +60,7 @@ describe('AuthController (e2e)', () => {
       expect(response.body).not.toHaveProperty('passwordHash');
     });
 
-    it('should return 409 if email already exists', async () => {
+    it('TC-E2E-B02: should return 409 if email already exists', async () => {
       const payload = {
         name: 'E2E User',
         email: 'e2e@test.com',
@@ -64,7 +73,7 @@ describe('AuthController (e2e)', () => {
         .expect(409);
     });
 
-    it('should return 400 for invalid payload', async () => {
+    it('TC-E2E-B03: should return 400 for invalid payload', async () => {
       const payload = {
         name: 'U', // Too short
         email: 'invalid-email',
@@ -75,6 +84,68 @@ describe('AuthController (e2e)', () => {
         .post('/auth/register')
         .send(payload)
         .expect(400);
+    });
+  });
+
+  describe('/auth/login (POST)', () => {
+    beforeAll(async () => {
+      // Ensure test user exists for login tests
+      await prisma.user.upsert({
+        where: { email: 'e2e@test.com' },
+        update: {},
+        create: {
+          name: 'E2E User',
+          email: 'e2e@test.com',
+          passwordHash:
+            '$2b$10$EPf9avv.WnJ7FmS6mHhO.uWx6lJmG2zQzFz0zFz0zFz0zFz0zFz0z', // "password123"
+        },
+      });
+    });
+
+    it('TC-E2E-B04: should login successfully (200)', async () => {
+      const payload = {
+        email: 'e2e@test.com',
+        password: 'password123',
+      };
+
+      const response = await request(
+        app.getHttpServer() as string | (() => void),
+      )
+        .post('/auth/login')
+        .send(payload)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('access_token');
+      const body = response.body as unknown as { user: { email: string } };
+      expect(body.user).toEqual(
+        expect.objectContaining({
+          email: payload.email,
+        }),
+      );
+    });
+
+    it('TC-E2E-B05: should return 401 for wrong password', async () => {
+      const payload = {
+        email: 'e2e@test.com',
+        password: 'wrongpassword',
+      };
+
+      await request(app.getHttpServer() as string | (() => void))
+        .post('/auth/login')
+        .send(payload)
+        .expect(401);
+    });
+
+    it('TC-E2E-B06: should return 401 for non-existent user', async () => {
+      const payload = {
+        email: 'nonexistent@test.com',
+        password: 'password123',
+      };
+
+      await request(app.getHttpServer() as string | (() => void))
+        .post('/auth/login')
+        .send(payload)
+        .expect(401);
     });
   });
 });

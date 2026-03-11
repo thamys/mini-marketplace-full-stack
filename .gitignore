@@ -1,6 +1,19 @@
 .env
+.env.local
 node_modules/
 .vscode/
 *.tsbuildinfo
-frontend/playwright-report/
-frontend/test-results/
+.DS_Store
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+
+# Tests
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

@@ -1,8 +1,23 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterSchema } from './dto/register.dto';
 import type { RegisterDto } from './dto/register.dto';
+import { LoginSchema } from './dto/login.dto';
+import type { LoginDto } from './dto/login.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -14,5 +29,36 @@ export class AuthController {
     @Body(new ZodValidationPipe(RegisterSchema)) registerDto: RegisterDto,
   ) {
     return await this.authService.register(registerDto);
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body(new ZodValidationPipe(LoginSchema)) loginDto: LoginDto) {
+    return await this.authService.login(loginDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  getProfile(
+    @Request()
+    req: {
+      user: { userId: string; email: string; name: string; role: string };
+    },
+  ) {
+    // We return a structured object to avoid direct coupling with prisma models
+    // and ensure no sensitive data is leaked even if req.user expands in the future.
+    return {
+      id: req.user.userId,
+      email: req.user.email,
+      name: req.user.name,
+      role: req.user.role,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('admin-test')
+  adminTest() {
+    return { message: 'Admin access granted' };
   }
 }

@@ -6,25 +6,25 @@ import { Prisma, User } from '@prisma/client';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findUserById(id: string): Promise<User | null> {
+  findUserById = async (id: string): Promise<User | null> => {
     return await this.prisma.user.findUnique({
       where: { id },
     });
-  }
+  };
 
-  async findUserByEmail(email: string): Promise<User | null> {
+  findUserByEmail = async (email: string): Promise<User | null> => {
     return await this.prisma.user.findUnique({
       where: { email },
     });
-  }
+  };
 
-  async findAllUsers(): Promise<User[]> {
+  findAllUsers = async (): Promise<User[]> => {
     return await this.prisma.user.findMany();
-  }
+  };
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+  createUser = async (data: Prisma.UserCreateInput): Promise<User> => {
     return await this.prisma.user.create({
       data,
     });
-  }
+  };
 }

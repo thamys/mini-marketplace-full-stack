@@ -4,10 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import Link from 'next/link';
 import {
   Form,
   FormControl,
@@ -19,6 +20,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import { mapErrorMessage } from '@/lib/error-mapping';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -29,12 +32,11 @@ const registerSchema = z.object({
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<RegisterValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(registerSchema as any),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -49,15 +51,16 @@ export default function RegisterPage() {
       const response = await api.post('/auth/register', values);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      await login(data.access_token, data.user);
       toast.success('Cadastro realizado com sucesso!');
-      router.push('/');
     },
     onError: (error: Error & { status?: number }) => {
+      const mappedMessage = mapErrorMessage(error.message);
       if (error.status === 409) {
-        form.setError('email', { type: 'manual', message: error.message });
+        form.setError('email', { type: 'manual', message: mappedMessage });
       } else {
-        setServerError(error.message);
+        setServerError(mappedMessage);
       }
     },
   });
@@ -120,9 +123,9 @@ export default function RegisterPage() {
               />
               
               {serverError && (
-                <div className="text-sm font-medium text-destructive mt-2 text-center">
-                  {serverError}
-                </div>
+                <Alert variant="destructive" className="mt-2">
+                  <AlertDescription>{serverError}</AlertDescription>
+                </Alert>
               )}
 
               <Button 
@@ -134,7 +137,7 @@ export default function RegisterPage() {
               </Button>
 
               <div className="text-center text-sm text-slate-500 mt-4">
-                Já tem uma conta? <a href="/login" className="text-primary hover:underline">Entre aqui</a>
+                Já tem uma conta? <Link href="/login" className="text-primary hover:underline">Entre aqui</Link>
               </div>
             </form>
           </Form>
