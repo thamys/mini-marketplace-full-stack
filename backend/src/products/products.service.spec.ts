@@ -3,7 +3,7 @@ import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
-import { Product } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -26,6 +26,9 @@ describe('ProductsService', () => {
         findMany: jest.fn(),
         count: jest.fn(),
         findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
       },
     };
 
@@ -137,6 +140,68 @@ describe('ProductsService', () => {
       await expect(service.findById('unknown-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('CRUD operations', () => {
+    it('TC-09.1.1: create() com payload válido → retorna produto criado', async () => {
+      const dto = {
+        name: 'New Product',
+        description: 'Desc',
+        price: 100,
+        category: 'cat',
+        stock: 5,
+        imageUrl: 'http://img.com',
+      };
+      (prisma.product.create as jest.Mock).mockResolvedValue(mockProduct);
+
+      const result = await service.create(dto);
+
+      expect(result).toEqual(mockProduct);
+      expect(prisma.product.create).toHaveBeenCalledWith({
+        data: {
+          ...dto,
+          price: new Prisma.Decimal(100),
+        },
+      });
+    });
+
+    it('TC-09.1.3: update() com id válido → retorna produto atualizado', async () => {
+      const dto = { price: 200 };
+      (prisma.product.findUnique as jest.Mock).mockResolvedValue(mockProduct);
+      (prisma.product.update as jest.Mock).mockResolvedValue({
+        ...mockProduct,
+        price: new Prisma.Decimal(200),
+      });
+
+      const result = await service.update('1', dto);
+
+      expect(result.price).toEqual(new Prisma.Decimal(200));
+      expect(prisma.product.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: expect.objectContaining({
+          price: new Prisma.Decimal(200),
+        }),
+      });
+    });
+
+    it('TC-09.1.4: update() com id inválido → lança NotFoundException', async () => {
+      (prisma.product.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.update('unknown', { name: 'New' })).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('TC-09.1.5: delete() com id válido → produto removido do banco', async () => {
+      (prisma.product.findUnique as jest.Mock).mockResolvedValue(mockProduct);
+      (prisma.product.delete as jest.Mock).mockResolvedValue(mockProduct);
+
+      await service.delete('1');
+
+      expect(prisma.product.delete).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
   });
 });
