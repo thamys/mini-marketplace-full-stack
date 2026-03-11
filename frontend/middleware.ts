@@ -19,7 +19,14 @@ export function middleware(request: NextRequest) {
 
   // 2. If trying to access login/register with a valid token -> Redirect to home
   if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL('/', request.url));
+    try {
+      jwtDecode(token);
+      return NextResponse.redirect(new URL('/', request.url));
+    } catch {
+      const response = NextResponse.next();
+      response.cookies.delete('auth_token');
+      return response;
+    }
   }
 
   // 3. RBAC: Role-based access control

@@ -8,6 +8,13 @@ export async function POST(request: Request) {
   try {
     const { token } = await request.json();
 
+    // CSRF/Origin protection
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+    if (origin && !origin.includes(host || '')) {
+       return NextResponse.json({ message: 'Invalid origin' }, { status: 403 });
+    }
+
     if (!token) {
       return NextResponse.json({ message: 'Token is required' }, { status: 400 });
     }

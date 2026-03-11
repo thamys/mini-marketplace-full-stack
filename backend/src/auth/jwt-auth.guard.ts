@@ -8,13 +8,12 @@ interface ExtendedJwtInfo {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  handleRequest<TUser = any>(
-    err: any,
+  handleRequest<TUser = unknown>(
+    err: unknown,
     user: TUser,
     info: ExtendedJwtInfo | undefined,
   ): TUser {
     if (err || !user) {
-      // console.log('JWT Auth info:', info); // Debugging
       if (info?.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token expired');
       }
@@ -24,7 +23,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (!info || info.message === 'No auth token') {
         throw new UnauthorizedException('Token not provided');
       }
-      throw err || new UnauthorizedException('Invalid token');
+      throw err instanceof Error
+        ? err
+        : new UnauthorizedException('Invalid token');
     }
     return user;
   }

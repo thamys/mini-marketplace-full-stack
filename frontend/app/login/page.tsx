@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginSchema, type LoginDto } from '@/lib/validations/auth';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { mapErrorMessage } from '@/lib/error-mapping';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,7 +54,7 @@ export default function LoginPage() {
       toast.success('Login realizado com sucesso!');
     },
     onError: (error: Error) => {
-      setServerError(error.message);
+      setServerError(mapErrorMessage(error.message));
       toast.error('Ocorreu um erro');
     },
   });

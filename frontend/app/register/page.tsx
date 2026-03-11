@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { mapErrorMessage } from '@/lib/error-mapping';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -55,10 +56,11 @@ export default function RegisterPage() {
       toast.success('Cadastro realizado com sucesso!');
     },
     onError: (error: Error & { status?: number }) => {
+      const mappedMessage = mapErrorMessage(error.message);
       if (error.status === 409) {
-        form.setError('email', { type: 'manual', message: error.message });
+        form.setError('email', { type: 'manual', message: mappedMessage });
       } else {
-        setServerError(error.message);
+        setServerError(mappedMessage);
       }
     },
   });
