@@ -10,9 +10,12 @@ export class ZodValidationPipe implements PipeTransform {
 
     if (!result.success) {
       const errors = result.error.flatten().fieldErrors;
+      const formErrors = result.error.flatten().formErrors;
+      
       throw new BadRequestException({
         message: 'Validation failed',
         errors,
+        formErrors,
       });
     }
 
