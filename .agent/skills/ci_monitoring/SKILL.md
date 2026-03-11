@@ -75,10 +75,27 @@ gh run view <run-id> --job <job-id> --log | grep -C 5 "FAILED TO INITIALIZE"
 - **Diagnosis**: A previous test run didn't clean up its processes or multiple workers are conflicting.
 - **Fix**: Ensure `afterAll` always closes the application and database connections.
 
-## 🚀 Useful Scripts
+## 📈 Pipe Tracking and Health Analysis
 
-| Purpose                | Command                                                                                                             |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| **Watch Latest Run**   | `gh run list --limit 1 --json databaseId --jq '.[0].databaseId' \| xargs gh run watch`                              |
-| **View Failed Steps**  | `gh run list --limit 1 --json databaseId --jq '.[0].databaseId' \| xargs gh run view --log-failed`                  |
-| **Check Backend Logs** | `gh run list --limit 1 --json databaseId --jq '.[0].databaseId' \| xargs gh run view --job "Tests — Backend" --log` |
+### 1. Analyze Pass/Fail Ratio
+
+Check the success rate of the last 20 runs to identify flakiness:
+
+```bash
+gh run list --limit 20 --json status,conclusion --jq 'map(select(.conclusion == "failure")) | length'
+```
+
+### 2. Identify Long-Running Jobs
+
+Pinpoint performance bottlenecks in the pipeline:
+
+```bash
+gh run view <run-id> --json jobs --jq '.jobs[] | {name: .name, duration: (.completedAt | fromdate) - (.startedAt | fromdate)}'
+```
+
+### 3. Systematic Pipe Monitoring Workflow
+
+1. **Trigger**: AI detects a failure or is asked to monitor status.
+2. **Context**: Use `gh run list` to find the relevant run.
+3. **Drill Down**: Use `gh run view --log-failed` to find the exact step.
+4. **Historical Check**: Search previous runs for the same error pattern to see if it's a regression or a known flaky test.
