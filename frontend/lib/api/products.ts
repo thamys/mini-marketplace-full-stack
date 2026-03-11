@@ -1,0 +1,39 @@
+import { api } from '../api';
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: string | number; // Decimal string from Prisma
+  category: string;
+  stock: number;
+  imageUrl?: string;
+  createdAt: string;
+}
+
+export interface ProductsMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface GetProductsResponse {
+  data: Product[];
+  meta: ProductsMeta;
+}
+
+export async function getProducts(params?: {
+  search?: string;
+  category?: string;
+  page?: number;
+  limit?: number;
+}): Promise<GetProductsResponse> {
+  const { data } = await api.get<GetProductsResponse>('/products', { params });
+  return data;
+}
+
+export async function getProductById(id: string): Promise<Product> {
+  const { data } = await api.get<Product>(`/products/${id}`);
+  return data;
+}
