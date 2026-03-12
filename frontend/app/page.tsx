@@ -37,9 +37,7 @@ function CatalogContent() {
     <div className="flex flex-col gap-8">
       <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,350px))] gap-6 justify-center">
         {result.data.map((product) => (
-          <article key={product.id}>
-            <ProductCard product={product} />
-          </article>
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
       <Pagination totalPages={result.meta.totalPages} currentPage={result.meta.page} />
