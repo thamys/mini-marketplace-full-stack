@@ -11,10 +11,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((word) => word[0])
+function getInitials(email: string): string {
+  const [localPart] = email.split('@');
+  return localPart
+    .split('.')
+    .map((part) => part[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
@@ -28,7 +29,7 @@ export default function Header() {
     await logout();
   };
 
-  const initials = user ? getInitials(user.name) : '';
+  const initials = user ? getInitials(user.email) : '';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
