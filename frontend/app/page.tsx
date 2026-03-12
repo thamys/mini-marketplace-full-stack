@@ -8,6 +8,7 @@ import { ProductCard } from '@/components/product-card';
 import { SearchFilters } from '@/components/search-filters';
 import { Pagination } from '@/components/pagination';
 import { CatalogSkeleton } from '@/components/catalog-skeleton';
+import { SearchFiltersSkeleton } from '@/components/skeletons/search-filters-skeleton';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -35,7 +36,7 @@ function CatalogContent() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,350px))] gap-6 justify-center">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 justify-center">
         {result.data.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -78,7 +79,7 @@ export default function CatalogPage() {
           </p>
         </div>
 
-        <Suspense fallback={<div className="h-[116px] w-full animate-pulse bg-zinc-100 dark:bg-zinc-800 rounded-lg shadow-sm border"></div>}>
+        <Suspense fallback={<SearchFiltersSkeleton />}>
           <SearchFilters />
         </Suspense>
 
