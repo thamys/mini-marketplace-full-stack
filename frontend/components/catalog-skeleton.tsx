@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 export function CatalogSkeleton() {
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,350px))] gap-6 justify-center">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 justify-center">
         {Array.from({ length: 8 }).map((_, i) => (
           <Card key={`skeleton-${i}`} className="h-full flex flex-col overflow-hidden p-0 border border-zinc-200 dark:border-zinc-800 animate-pulse">
             <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-900" />
