@@ -4,7 +4,6 @@ import { getProductById } from '@/lib/api/products';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
@@ -18,9 +17,9 @@ export default function ProductDetailsPage() {
     queryKey: ['product', id],
     queryFn: () => getProductById(id),
     enabled: !!id,
-    retry: (failureCount, error) => {
+    retry: (failureCount, error: Error & { status?: number }) => {
       // Don't retry on 404
-      if (error instanceof AxiosError && error.response?.status === 404) return false;
+      if (error?.status === 404) return false;
       return failureCount < 3;
     },
   });
