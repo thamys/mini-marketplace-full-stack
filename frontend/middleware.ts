@@ -12,8 +12,6 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.includes(pathname);
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
-  console.log('MIDDLEWARE:', { pathname, isProtectedRoute, hasToken: !!token });
-
   // 1. If trying to access a protected route without a token -> Redirect to login
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL('/login', request.url));
