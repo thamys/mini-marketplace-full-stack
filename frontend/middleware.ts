@@ -2,6 +2,21 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtDecode } from 'jwt-decode';
 
+function getRbacRedirect(pathname: string, token: string, url: string): NextResponse | null {
+  try {
+    const decoded = jwtDecode<{ role: string }>(token);
+    if (pathname.startsWith('/admin') && decoded.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', url));
+    }
+    if (pathname.startsWith('/orders') && decoded.role === 'ADMIN') {
+      return NextResponse.redirect(new URL('/admin/orders', url));
+    }
+    return null;
+  } catch {
+    return NextResponse.redirect(new URL('/login', url));
+  }
+}
+
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
   const { pathname } = request.nextUrl;
@@ -30,15 +45,9 @@ export function middleware(request: NextRequest) {
   }
 
   // 3. RBAC: Role-based access control
-  if (pathname.startsWith('/admin') && token) {
-    try {
-      const decoded = jwtDecode<{ role: string }>(token);
-      if (decoded.role !== 'ADMIN') {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-    } catch {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  if ((pathname.startsWith('/admin') || pathname.startsWith('/orders')) && token) {
+    const redirect = getRbacRedirect(pathname, token, request.url);
+    if (redirect) return redirect;
   }
 
   return NextResponse.next();
