@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000/api';
+const PROXY_TIMEOUT_MS = process.env.PROXY_TIMEOUT_MS ? Number(process.env.PROXY_TIMEOUT_MS) : 10000;
 
 async function handleProxyRequest(
   request: NextRequest,
@@ -37,14 +38,21 @@ async function handleProxyRequest(
       },
       ...(body && { data: body }),
       validateStatus: () => true,
-      timeout: 1000,
+      timeout: PROXY_TIMEOUT_MS,
     };
 
     const response = await axios(config);
 
     return NextResponse.json(response.data, { status: response.status });
   } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: unknown; status?: number }; message: string };
+    if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
+      console.error('Proxy timeout:', error.message);
+      return NextResponse.json(
+        { message: 'Gateway Timeout: the backend did not respond in time.' },
+        { status: 504 }
+      );
+    }
+    const axiosError = error as { message: string };
     console.error('Proxy error:', axiosError.message);
     return NextResponse.json(
       { message: 'Internal Server Error' },
