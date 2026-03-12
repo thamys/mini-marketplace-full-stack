@@ -75,7 +75,7 @@ export default function LoginPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {serverError && (
-                <Alert variant="destructive" data-testid="login-error">
+                <Alert variant="destructive" data-testid="auth-error">
                   <AlertDescription>{serverError}</AlertDescription>
                 </Alert>
               )}
@@ -91,6 +91,7 @@ export default function LoginPage() {
                         placeholder="seu@email.com"
                         {...field}
                         className={errors.email ? 'border-destructive' : ''}
+                        data-testid="email-input"
                       />
                     </FormControl>
                     <FormMessage />
@@ -110,13 +111,14 @@ export default function LoginPage() {
                         placeholder="******"
                         {...field}
                         className={errors.password ? 'border-destructive' : ''}
+                        data-testid="password-input"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={mutation.isPending}>
+              <Button type="submit" className="w-full" disabled={mutation.isPending} data-testid="login-submit">
                 {mutation.isPending ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>

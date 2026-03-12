@@ -19,7 +19,7 @@ export default function ProfilePage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Perfil do Usuário</CardTitle>
+          <CardTitle className="text-2xl font-bold" data-testid="profile-title">Perfil do Usuário</CardTitle>
           <CardDescription>Informações da sua conta</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -35,7 +35,7 @@ export default function ProfilePage() {
             <p className="text-sm font-medium text-gray-500">Função</p>
             <p className="text-lg capitalize">{user.role}</p>
           </div>
-          <Button onClick={logout} variant="destructive" className="w-full">
+          <Button onClick={logout} variant="destructive" className="w-full" data-testid="logout-button">
             Sair
           </Button>
         </CardContent>

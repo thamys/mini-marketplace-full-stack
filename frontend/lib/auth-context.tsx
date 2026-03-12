@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 interface User {
   id: string;
   email: string;
-  name: string;
   role: string;
 }
 
@@ -25,14 +24,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null);
   const router = useRouter();
 
-  const { isLoading: loading } = useQuery({
+  const { isLoading: loading, data: sessionData } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       try {
         const response = await axios.get('/api/auth/session');
-        if (response.data.authenticated) {
-          setUser(response.data.user);
-        }
         return response.data;
       } catch {
         return { authenticated: false };
@@ -40,6 +36,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     retry: false,
   });
+
+  React.useEffect(() => {
+    if (!loading) {
+      if (sessionData?.authenticated && sessionData?.user) {
+        setUser(sessionData.user);
+      } else {
+        setUser(null);
+      }
+    }
+  }, [loading, sessionData]);
 
   const login = React.useCallback(async (token: string, userData: User) => {
     await axios.post('/api/auth/session', { token });

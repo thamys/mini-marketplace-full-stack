@@ -1,65 +1,93 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getProducts } from '@/lib/api/products';
+import { ProductCard } from '@/components/product-card';
+import { SearchFilters } from '@/components/search-filters';
+import { Pagination } from '@/components/pagination';
+import { CatalogSkeleton } from '@/components/catalog-skeleton';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+function CatalogContent() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get('search') || undefined;
+  const category = searchParams.get('category') || undefined;
+  const page = Number(searchParams.get('page')) || 1;
+  const limit = 12;
+
+  const { data: result } = useSuspenseQuery({
+    queryKey: ['products', { search, category, page, limit }],
+    queryFn: () => getProducts({ search, category, page, limit }),
+  });
+
+  if (!result || result.data.length === 0) {
+    return (
+      <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800">
+        <h3 className="text-xl font-medium">Nenhum produto encontrado</h3>
+        <p className="text-zinc-500 mt-2">Tente alterar os termos de busca ou categoria.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,350px))] gap-6 justify-center">
+        {result.data.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+      <Pagination totalPages={result.meta.totalPages} currentPage={result.meta.page} />
+    </div>
+  );
+}
+
+function ErrorFallback({ resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {
+  return (
+    <div className="text-center py-16 px-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20" data-testid="page-error">
+      <div className="inline-flex items-center justify-center p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+        <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+      </div>
+      <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">Ops! Algo deu errado</h3>
+      <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
+        Não conseguimos carregar o catálogo de produtos no momento. Por favor, tente novamente.
+      </p>
+      <Button 
+        onClick={resetErrorBoundary}
+        variant="destructive"
+        className="gap-2"
+      >
+        <RefreshCcw className="h-4 w-4" />
+        Tentar novamente
+      </Button>
+    </div>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <main className="container mx-auto py-8 px-4 md:px-6" id="main-content" aria-labelledby="catalog-title">
+      <div className="flex flex-col space-y-8">
+        <div>
+          <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">Catálogo de Produtos</h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Navegue por nossa seleção de ofertas incríveis.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/8 px-5 transition-colors hover:border-transparent hover:bg-black/4 dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <Suspense fallback={<div className="h-[116px] w-full animate-pulse bg-zinc-100 dark:bg-zinc-800 rounded-lg shadow-sm border"></div>}>
+          <SearchFilters />
+        </Suspense>
+
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<CatalogSkeleton />}>
+            <CatalogContent />
+          </Suspense>
+        </ErrorBoundary>
+      </div>
+    </main>
   );
 }

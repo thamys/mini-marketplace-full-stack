@@ -19,3 +19,8 @@ Follow these rules to maintain code quality and consistency across the project.
 
 - Use **Zod** for schema validation in both frontend and backend.
 - Maintain consistent DTO names (e.g., `LoginDto`, `RegisterDto`).
+
+## Configuration and Fail-Fast
+
+- **Environment Variables**: For critical infrastructure (DB, JWT, Redis), ALWAYS use `configService.getOrThrow('VARIABLE_NAME')` in NestJS to ensure the application fails fast if misconfigured.
+- **Validation**: Validate external payloads immediately using Zod or Class Validator to prevent corrupt state from entering the system.
