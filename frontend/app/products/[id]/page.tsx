@@ -28,7 +28,7 @@ export default function ProductDetailsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4" id="main-content">
+      <div className="container mx-auto py-8 px-4">
         <div className="mb-6">
           <div className="h-10 w-24 bg-zinc-200 dark:bg-zinc-800 animate-pulse rounded"></div>
         </div>
@@ -63,7 +63,7 @@ export default function ProductDetailsPage() {
   }).format(Number(product.price));
 
   return (
-    <main className="container mx-auto py-8 px-4" id="main-content">
+    <div className="container mx-auto py-8 px-4">
       <div className="mb-6">
         <Button
           variant="ghost"
@@ -135,6 +135,6 @@ export default function ProductDetailsPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
