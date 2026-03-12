@@ -5,6 +5,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 
+const toSlug = (str: string) =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, '-');
+
 export function SearchFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -76,7 +79,7 @@ export function SearchFilters() {
             variant={currentCategory === cat ? 'default' : 'outline'}
             size="sm"
             onClick={() => handleFilterChange('category', cat)}
-            data-testid={`category-filter-${cat.toLowerCase()}`}
+            data-testid={`category-filter-${toSlug(cat)}`}
           >
             {cat}
           </Button>
