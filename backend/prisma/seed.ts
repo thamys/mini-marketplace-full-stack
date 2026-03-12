@@ -62,7 +62,7 @@ async function main() {
       price: baseProduct.price,
       category: baseProduct.category,
       stock: Math.floor(Math.random() * 50) + 1,
-      imageUrl: `https://placehold.co/600x600?text=${encodeURIComponent(baseProduct.name)}`,
+      imageUrl: `https://placehold.co/600x600/png?text=${encodeURIComponent(baseProduct.name)}`,
     };
   });
 
