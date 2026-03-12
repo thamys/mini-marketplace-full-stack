@@ -19,8 +19,6 @@ export const metadata: Metadata = {
 
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/components/Providers";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -37,11 +35,7 @@ export default function RootLayout({
           Pular para o conteúdo
         </a>
         <Providers>
-          <Header />
-          <main id="main-content" className="flex-1 focus:outline-none" tabIndex={-1}>
-            {children}
-          </main>
-          <Footer />
+          {children}
         </Providers>
         <Toaster position="top-right" richColors />
       </body>
