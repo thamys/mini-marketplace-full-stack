@@ -28,7 +28,7 @@ test.describe('Product Details Page - E2E Tests', () => {
     await page.goto('/products/1');
     
     // Verify title matches using standardized testid
-    await expect(page.getByTestId('product-name')).toHaveText(mockProduct.name, { timeout: 15000 });
+    await expect(page.getByTestId('product-name')).toHaveText(mockProduct.name, { timeout: 3000 });
     
     // Verify Buy button exists using standardized testid
     await expect(page.getByTestId('buy-button')).toBeVisible();
@@ -50,8 +50,8 @@ test.describe('Product Details Page - E2E Tests', () => {
 
     // Wait for the loading to finish and error to appear using standardized testid
     const errorAlert = page.getByTestId('page-error');
-    await expect(errorAlert).toBeVisible({ timeout: 15000 });
-    await expect(errorAlert.locator('h1')).toHaveText('Produto não encontrado');
+    await expect(errorAlert).toBeVisible({ timeout: 5000 });
+    await expect(errorAlert.locator('h1')).toHaveText('Produto não encontrado', { timeout: 5000 });
     await expect(errorAlert).toContainText('O produto que você está procurando não existe ou foi removido.');
   });
 });

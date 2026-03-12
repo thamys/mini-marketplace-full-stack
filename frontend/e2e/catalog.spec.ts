@@ -55,7 +55,7 @@ test.describe('Catalog Page - E2E Tests', () => {
     await page.goto('/?search=Notebook');
 
     // Wait for the products to load using standardized testid
-    await expect(page.getByTestId('product-card').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('product-card').first()).toBeVisible({ timeout: 5000 });
 
     // Check search input value using standardized testid
     const searchInput = page.getByTestId('search-input').first();
@@ -77,7 +77,7 @@ test.describe('Catalog Page - E2E Tests', () => {
     await page.goto('/?search=nonexistent_xyz_123_random_unique');
 
     // Wait for loading to finish
-    await expect(page.locator('h3', { hasText: 'Nenhum produto encontrado' })).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('h3', { hasText: 'Nenhum produto encontrado' })).toBeVisible({ timeout: 5000 });
     await expect(page.locator('p', { hasText: 'Tente alterar os termos de busca ou categoria.' })).toBeVisible();
   });
 
@@ -107,7 +107,7 @@ test.describe('Catalog Page - E2E Tests', () => {
     await page.goto('/');
 
     // Wait for the products to load
-    await expect(page.getByTestId('product-card').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('product-card').first()).toBeVisible({ timeout: 5000 });
 
     const firstProduct = page.getByTestId('product-card').first();
     const productName = await firstProduct.locator('h3').innerText();

@@ -86,9 +86,10 @@ test.describe('Register Page E2E', () => {
     ]);
 
     // Sonner toast check
-    await expect(page.locator('body')).toContainText('Cadastro realizado com sucesso!', { timeout: 15000 });
+    await expect(page.locator('body')).toContainText('Cadastro realizado com sucesso!', { timeout: 5000 });
     
-    await expect(page).toHaveURL('/', { timeout: 15000 });
+    await page.waitForURL('/', { timeout: 5000 });
+    await expect(page).toHaveURL('/');
   });
 
   test('TC-06: Error Treatment - Should display error for already registered email (409)', async ({ page }) => {
@@ -115,7 +116,7 @@ test.describe('Register Page E2E', () => {
 
     // Check for the error message using standardized testid
     const errorAlert = page.getByTestId('auth-error');
-    await expect(errorAlert).toBeVisible({ timeout: 15000 });
+    await expect(errorAlert).toBeVisible({ timeout: 5000 });
     await expect(errorAlert).toContainText('já está cadastrado');
   });
 
@@ -123,8 +124,8 @@ test.describe('Register Page E2E', () => {
     // Direct click to trigger validation
     await page.getByTestId('register-submit').click();
 
-    await expect(page.locator('body')).toContainText('O nome deve ter pelo menos 2 caracteres', { timeout: 10000 });
-    await expect(page.locator('body')).toContainText('Email inválido', { timeout: 10000 });
-    await expect(page.locator('body')).toContainText('A senha deve ter pelo menos 8 caracteres', { timeout: 10000 });
+    await expect(page.locator('body')).toContainText('O nome deve ter pelo menos 2 caracteres', { timeout: 5000 });
+    await expect(page.locator('body')).toContainText('Email inválido', { timeout: 5000 });
+    await expect(page.locator('body')).toContainText('A senha deve ter pelo menos 8 caracteres', { timeout: 5000 });
   });
 });

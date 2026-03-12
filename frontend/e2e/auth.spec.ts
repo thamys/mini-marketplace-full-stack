@@ -77,10 +77,11 @@ test.describe('Authentication Flow - Standardized', () => {
     await page.getByTestId('login-submit').click();
 
     // Verify success toast first
-    await expect(page.locator('body')).toContainText('Login realizado com sucesso!', { timeout: 15000 });
+    await expect(page.locator('body')).toContainText('Login realizado com sucesso!', { timeout: 5000 });
 
-    // Then verify redirection to home
-    await expect(page).toHaveURL('/', { timeout: 15000 });
+    // Then verify redirection to home - wait for URL change
+    await page.waitForURL('/', { timeout: 5000 });
+    await expect(page).toHaveURL('/');
   });
 
   test('TC-02: Invalid credentials - Should display error alert', async ({ page }) => {
@@ -109,10 +110,8 @@ test.describe('Authentication Flow - Standardized', () => {
 
     // Click and wait for the mock response
     try {
-      await Promise.all([
-        page.waitForResponse(resp => resp.url().includes('/auth/login') && resp.request().method() === 'POST', { timeout: 10000 }),
-        page.getByTestId('login-submit').click()
-      ]);
+      await page.getByTestId('login-submit').click();
+      await page.waitForResponse(resp => resp.url().includes('/auth/login') && resp.request().method() === 'POST', { timeout: 5000 });
     } catch (e) {
       console.error('Wait for response failed:', e);
       const isDisabled = await page.getByTestId('login-submit').isDisabled();
@@ -133,7 +132,7 @@ test.describe('Authentication Flow - Standardized', () => {
       console.log(`Alert text: ${await errorAlert.textContent()}`);
     }
 
-    await expect(errorAlert).toBeVisible({ timeout: 15000 });
+    await expect(errorAlert).toBeVisible({ timeout: 5000 });
     await expect(errorAlert).toContainText('E-mail ou senha incorretos.');
   });
 
@@ -153,14 +152,14 @@ test.describe('Authentication Flow - Standardized', () => {
     await page.context().addCookies([{
       name: 'auth_token',
       value: dummyJwt,
-      url: 'http://127.0.0.1:3000'
+      url: 'http://localhost:3000'
     }]);
 
-    await page.goto('/login', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL('/', { timeout: 15000 });
+    await page.goto('/login', { waitUntil: 'networkidle' });
+    await expect(page).toHaveURL('/', { timeout: 5000 });
 
-    await page.goto('/register', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL('/', { timeout: 15000 });
+    await page.goto('/register', { waitUntil: 'networkidle' });
+    await expect(page).toHaveURL('/', { timeout: 5000 });
   });
 
   test('TC-04: Navigation - Should navigate between login and register pages', async ({ page }) => {
