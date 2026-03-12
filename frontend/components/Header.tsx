@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,12 +25,35 @@ function getInitials(email: string): string {
 export default function Header() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
   };
 
+  const isAdmin = user?.role === 'ADMIN' || pathname.startsWith('/admin');
   const initials = user ? getInitials(user.email) : '';
+
+  if (isAdmin) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="container px-8 flex h-16 max-w-screen-2xl items-center justify-between">
+          <Link href="/" className="font-bold text-lg" aria-label="Marketplace - Ir para a página inicial">
+            Marketplace
+          </Link>
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-1 rounded">ADMIN</span>
+            <button 
+              onClick={handleLogout}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
