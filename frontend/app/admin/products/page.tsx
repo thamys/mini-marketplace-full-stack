@@ -26,6 +26,7 @@ import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -137,19 +138,21 @@ function ProductsTableContent({ page, search, onEdit, onDelete, onPageChange }: 
                         <MoreHorizontal className="h-5 w-5" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-[160px] animate-in slide-in-from-top-1 duration-200">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => onEdit(product)} className="cursor-pointer gap-2">
-                          <Pencil className="h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer gap-2"
-                          onClick={() => onDelete(product.id, product.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Excluir
-                        </DropdownMenuItem>
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => onEdit(product)} className="cursor-pointer gap-2">
+                            <Pencil className="h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer gap-2"
+                            onClick={() => onDelete(product.id, product.name)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
