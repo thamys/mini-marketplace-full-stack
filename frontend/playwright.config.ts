@@ -7,12 +7,12 @@ export default defineConfig({
     timeout: 3000
   },
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  forbidOnly: true,
+  retries: 2,
+  workers: 1,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
   projects: [
@@ -22,9 +22,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env.CI ? 'pnpm start' : 'pnpm run dev',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    command: 'pnpm build && pnpm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: false,
     timeout: 60 * 1000,
   },
 });
