@@ -38,8 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   React.useEffect(() => {
-    if (!loading && sessionData?.authenticated && sessionData?.user) {
-      setUser(sessionData.user);
+    if (!loading) {
+      if (sessionData?.authenticated && sessionData?.user) {
+        setUser(sessionData.user);
+      } else {
+        setUser(null);
+      }
     }
   }, [loading, sessionData]);
 
