@@ -1,13 +1,17 @@
 'use client';
 
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getOrders, type Order } from '@/lib/api/orders';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react';
-import React from 'react';
+import { ShoppingBag, ChevronDown, ChevronUp, AlertCircle, RefreshCcw } from 'lucide-react';
 import { OrdersSkeleton } from '@/components/skeletons/orders-skeleton';
+import { ErrorBoundary } from 'react-error-boundary';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+
+export const dynamic = 'force-dynamic';
 
 const STATUS_LABEL: Record<Order['status'], string> = {
   PENDING: 'Pendente',
@@ -126,7 +130,31 @@ function OrdersContent() {
   );
 }
 
+function ErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
+  return (
+    <div className="text-center py-16 px-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20">
+      <div className="inline-flex items-center justify-center p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
+        <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
+      </div>
+      <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">Ops! Algo deu errado</h3>
+      <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
+        Não conseguimos carregar seus pedidos no momento. Por favor, tente novamente.
+      </p>
+      <Button 
+        onClick={resetErrorBoundary}
+        variant="destructive"
+        className="gap-2"
+      >
+        <RefreshCcw className="h-4 w-4" />
+        Tentar novamente
+      </Button>
+    </div>
+  );
+}
+
 export default function OrdersPage() {
+  const { user, loading } = useAuth();
+
   return (
     <main className="container mx-auto py-8 px-4 md:px-6 max-w-3xl" aria-labelledby="orders-title">
       <div className="mb-8">
@@ -134,9 +162,19 @@ export default function OrdersPage() {
         <p className="text-muted-foreground mt-2">Histórico de compras realizadas.</p>
       </div>
 
-      <Suspense fallback={<OrdersSkeleton />}>
-        <OrdersContent />
-      </Suspense>
+      {loading ? (
+        <OrdersSkeleton />
+      ) : !user ? (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Redirecionando para login...</p>
+        </div>
+      ) : (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<OrdersSkeleton />}>
+            <OrdersContent />
+          </Suspense>
+        </ErrorBoundary>
+      )}
     </main>
   );
 }

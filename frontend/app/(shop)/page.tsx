@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -46,7 +48,7 @@ function CatalogContent() {
   );
 }
 
-function ErrorFallback({ resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {
+function ErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
   return (
     <div className="text-center py-16 px-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20" data-testid="page-error">
       <div className="inline-flex items-center justify-center p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
