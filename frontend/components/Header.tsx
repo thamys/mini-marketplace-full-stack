@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CartDrawer } from '@/components/cart/CartDrawer';
 
 function getInitials(email: string): string {
   const [localPart] = email.split('@');
@@ -43,14 +44,15 @@ export default function Header() {
             <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
           )}
           
+          <Link
+            href="/"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Produtos
+          </Link>
+
           {!loading && !user && (
             <>
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Produtos
-              </Link>
               <Link
                 href="/login"
                 className="text-sm font-medium hover:text-primary transition-colors"
@@ -68,37 +70,53 @@ export default function Header() {
 
           {!loading && user && (
             <>
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Produtos
-              </Link>
-
               {user.role === 'ADMIN' && (
-                <Link
-                  href="/admin/products"
-                  className="text-sm font-medium hover:text-primary transition-colors"
-                >
-                  Gerenciar Produtos
-                </Link>
+                <>
+                  <Link
+                    href="/admin/products"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                  >
+                    Gerenciar Produtos
+                  </Link>
+                  <Link
+                    href="/admin/orders"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                  >
+                    Gerenciar Pedidos
+                  </Link>
+                </>
               )}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
-                  {initials}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
-                    Meu Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user.role !== 'ADMIN' && (
+                <Link
+                  href="/orders"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
+                  Meus Pedidos
+                </Link>
+              )}
             </>
+          )}
+
+          {(!user || user.role !== 'ADMIN') && (
+            <CartDrawer />
+          )}
+
+          {!loading && user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
+                {initials}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </nav>
       </div>
