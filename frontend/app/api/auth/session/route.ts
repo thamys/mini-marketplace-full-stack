@@ -55,6 +55,7 @@ export async function GET() {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      timeout: 1000,
     });
 
     return NextResponse.json({

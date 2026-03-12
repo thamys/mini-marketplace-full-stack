@@ -37,6 +37,7 @@ async function handleProxyRequest(
       },
       ...(body && { data: body }),
       validateStatus: () => true,
+      timeout: 1000,
     };
 
     const response = await axios(config);

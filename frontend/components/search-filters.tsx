@@ -57,6 +57,7 @@ export function SearchFilters() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-[300px]"
+          data-testid="search-input"
         />
       </div>
       
@@ -65,6 +66,7 @@ export function SearchFilters() {
           variant={currentCategory === '' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleFilterChange('category', '')}
+          data-testid="category-filter-all"
         >
           Todos
         </Button>
@@ -74,6 +76,7 @@ export function SearchFilters() {
             variant={currentCategory === cat ? 'default' : 'outline'}
             size="sm"
             onClick={() => handleFilterChange('category', cat)}
+            data-testid={`category-filter-${cat.toLowerCase()}`}
           >
             {cat}
           </Button>

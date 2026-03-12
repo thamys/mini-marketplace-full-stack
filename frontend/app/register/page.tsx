@@ -56,12 +56,7 @@ export default function RegisterPage() {
       toast.success('Cadastro realizado com sucesso!');
     },
     onError: (error: Error & { status?: number }) => {
-      const mappedMessage = mapErrorMessage(error.message);
-      if (error.status === 409) {
-        form.setError('email', { type: 'manual', message: mappedMessage });
-      } else {
-        setServerError(mappedMessage);
-      }
+      setServerError(mapErrorMessage(error.message));
     },
   });
 
@@ -89,7 +84,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Seu nome" {...field} />
+                      <Input placeholder="Seu nome" {...field} data-testid="name-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,7 +97,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="seu@email.com" {...field} />
+                      <Input type="email" placeholder="seu@email.com" {...field} data-testid="email-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -115,7 +110,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} data-testid="password-input" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -123,7 +118,7 @@ export default function RegisterPage() {
               />
               
               {serverError && (
-                <Alert variant="destructive" className="mt-2">
+                <Alert variant="destructive" className="mb-4" data-testid="auth-error">
                   <AlertDescription>{serverError}</AlertDescription>
                 </Alert>
               )}
@@ -132,6 +127,7 @@ export default function RegisterPage() {
                 type="submit" 
                 className="w-full" 
                 disabled={mutation.isPending}
+                data-testid="register-submit"
               >
                 {mutation.isPending ? 'Cadastrando...' : 'Criar conta'}
               </Button>

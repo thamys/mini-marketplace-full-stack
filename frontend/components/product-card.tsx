@@ -19,6 +19,7 @@ export function ProductCard({ product }: ProductCardProps) {
         href={`/products/${product.id}`} 
         className="group h-full block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
         aria-label={`Ver detalhes do produto ${product.name}`}
+        data-testid="product-card"
       >
         <Card className="h-full flex flex-col overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-zinc-800 p-0 border border-zinc-200 dark:border-zinc-800">
           <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-b">

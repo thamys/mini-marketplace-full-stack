@@ -23,6 +23,7 @@ export function Pagination({ totalPages, currentPage }: { totalPages: number, cu
         variant="outline"
         onClick={() => router.push(createPageURL(Math.max(1, currentPage - 1)))}
         disabled={currentPage <= 1}
+        data-testid="pagination-prev"
       >
         Anterior
       </Button>
@@ -34,6 +35,7 @@ export function Pagination({ totalPages, currentPage }: { totalPages: number, cu
         variant="outline"
         onClick={() => router.push(createPageURL(Math.min(totalPages, currentPage + 1)))}
         disabled={currentPage >= totalPages}
+        data-testid="pagination-next"
       >
         Próximo
       </Button>

@@ -48,7 +48,7 @@ export default function ProductDetailsPage() {
 
   if (errorNotFound || !product) {
     return (
-      <div className="container mx-auto py-20 px-4 text-center mt-10">
+      <div className="container mx-auto py-20 px-4 text-center mt-10" data-testid="page-error">
         <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
         <p className="mb-8 text-zinc-600">O produto que você está procurando não existe ou foi removido.</p>
         <Button onClick={() => router.push('/')} className="px-6 py-2">
@@ -71,6 +71,7 @@ export default function ProductDetailsPage() {
           onClick={() => router.back()}
           className="gap-2 focus-visible:ring-2 focus-visible:ring-primary"
           aria-label="Voltar para o catálogo"
+          data-testid="back-button"
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar
@@ -99,8 +100,8 @@ export default function ProductDetailsPage() {
           <Badge className="w-fit mb-4" variant="secondary">
             {product.category}
           </Badge>
-          <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
-          <p className="text-2xl font-semibold mb-6 text-primary" aria-label={`Preço: ${priceFormatted}`}>
+          <h1 className="text-4xl font-bold mb-4" data-testid="product-name">{product.name}</h1>
+          <p className="text-2xl font-semibold mb-6 text-primary" aria-label={`Preço: ${priceFormatted}`} data-testid="product-price">
             {priceFormatted}
           </p>
           
@@ -128,6 +129,7 @@ export default function ProductDetailsPage() {
               className="w-full text-lg h-14 shadow-lg shadow-primary/20" 
               disabled={product.stock === 0}
               aria-label={product.stock > 0 ? `Comprar ${product.name}` : `Produto ${product.name} indisponível`}
+              data-testid="buy-button"
             >
               Comprar Agora
             </Button>
