@@ -79,9 +79,9 @@ test.describe('Authentication Flow - Standardized', () => {
     // Verify success toast first
     await expect(page.locator('body')).toContainText('Login realizado com sucesso!', { timeout: 5000 });
 
-    // Then verify redirection to home - wait for URL change
-    await page.waitForURL('/', { timeout: 5000 });
-    await expect(page).toHaveURL('/');
+    // Then verify redirection to admin - wait for URL change
+    await page.waitForURL('/admin', { timeout: 10000 });
+    await expect(page).toHaveURL('/admin');
   });
 
   test('TC-02: Invalid credentials - Should display error alert', async ({ page }) => {
