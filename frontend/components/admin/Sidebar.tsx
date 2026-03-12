@@ -7,7 +7,6 @@ import {
   LayoutDashboard, 
   Package, 
   ShoppingBag, 
-  Store,
   LogOut
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
@@ -64,13 +63,6 @@ export function Sidebar() {
       </nav>
 
       <div className="p-4 border-t space-y-2">
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm font-medium hover:bg-muted text-muted-foreground hover:text-foreground"
-        >
-          <Store className="h-4 w-4" />
-          Voltar para a Loja
-        </Link>
         <button
           onClick={() => logout()}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm font-medium hover:bg-destructive/10 text-destructive"
