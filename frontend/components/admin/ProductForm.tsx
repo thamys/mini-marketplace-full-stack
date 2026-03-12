@@ -114,7 +114,18 @@ export function ProductForm({
               <FormItem>
                 <FormLabel>Preço (R$)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(field.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      const numericValue = Number(value) / 100;
+                      field.onChange(numericValue);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,7 +139,11 @@ export function ProductForm({
               <FormItem>
                 <FormLabel>Estoque</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} />
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
