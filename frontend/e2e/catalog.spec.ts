@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.fixme('Catalog Page - E2E Tests', () => {
+test.describe('Catalog Page - E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Increase timeout for cold starts
     page.setDefaultTimeout(60000);
@@ -65,7 +65,7 @@ test.describe.fixme('Catalog Page - E2E Tests', () => {
     await expect(page.getByTestId('product-card').first()).toContainText('Notebook', { ignoreCase: true });
   });
 
-  test.fixme('TC-08.5.3: Empty state com busca sem resultados', async ({ page }) => {
+  test('TC-08.5.3: Empty state com busca sem resultados', async ({ page }) => {
     await page.route('**/api/products*', async route => {
       await route.fulfill({
         status: 200,

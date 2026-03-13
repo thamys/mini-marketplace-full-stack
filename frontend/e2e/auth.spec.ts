@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe.fixme('Authentication Flow - Standardized', () => {
+test.describe('Authentication Flow - Standardized', () => {
   test.beforeEach(async ({ page }) => {
     // Increase timeout for cold starts
     page.setDefaultTimeout(60000);
@@ -33,21 +33,10 @@ test.describe.fixme('Authentication Flow - Standardized', () => {
       }
     });
 
-    // Listen for console logs, requests and responses in the browser
-    page.on('console', msg => {
-      if (msg.type() === 'error') console.log(`BROWSER CONSOLE [${msg.type()}]: ${msg.text()}`);
-    });
-    page.on('request', request => {
-      if (request.url().includes('/api/')) console.log(`>> REQUEST: ${request.method()} ${request.url()}`);
-    });
-    page.on('response', response => {
-      if (response.url().includes('/api/')) console.log(`<< RESPONSE: ${response.status()} ${response.url()}`);
-    });
-
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
   });
 
-  test.fixme('TC-01: Successful login - Should display success toast and redirect to home', async ({ page }) => {
+  test('TC-01: Successful login - Should display success toast and redirect to home', async ({ page }) => {
     const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJhZG1pbkBtYXJrZXRwbGFjZS5jb20iLCJyZWFsX25hbWUiOiJBZG1pbiIsIm5hbWUiOiJBZG1pbiIsInJvbGUiOiJBRE1JTiJ9.signature";
     const mockUser = { id: '1', email: 'admin@marketplace.com', name: 'Admin', role: 'ADMIN' };
     
@@ -104,39 +93,14 @@ test.describe.fixme('Authentication Flow - Standardized', () => {
     await page.getByTestId('password-input').pressSequentially('password123', { delay: 50 });
     await page.keyboard.press('Tab');
     
-    const emailValue = await page.getByTestId('email-input').inputValue();
-    const passValue = await page.getByTestId('password-input').inputValue();
-    console.log(`Fields typed: ${emailValue} / ${passValue.length} chars. Clicking login submit...`);
+    await page.getByTestId('login-submit').click();
+    await page.waitForResponse(resp => resp.url().includes('/auth/login') && resp.request().method() === 'POST', { timeout: 5000 });
 
-    // Click and wait for the mock response
-    try {
-      await page.getByTestId('login-submit').click();
-      await page.waitForResponse(resp => resp.url().includes('/auth/login') && resp.request().method() === 'POST', { timeout: 5000 });
-    } catch (e) {
-      console.error('Wait for response failed:', e);
-      const isDisabled = await page.getByTestId('login-submit').isDisabled();
-      console.log(`Is login button disabled? ${isDisabled}`);
-      // Check if there are any error messages visible
-      const errors = await page.locator('div[role="alert"], .text-destructive').allTextContents();
-      console.log('Visible errors:', errors);
-      throw e;
-    }
-
-    // Use the standardized testid
-    const errorAlert = page.getByTestId('auth-error');
-    
-    // Log visibility and text for debugging
-    const isVisible = await errorAlert.isVisible();
-    console.log(`Alert visible: ${isVisible}`);
-    if (isVisible) {
-      console.log(`Alert text: ${await errorAlert.textContent()}`);
-    }
-
-    await expect(errorAlert).toBeVisible({ timeout: 5000 });
-    await expect(errorAlert).toContainText('E-mail ou senha incorretos.');
+    await expect(page.getByTestId('auth-error')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('auth-error')).toContainText('E-mail ou senha incorretos.');
   });
 
-  test.fixme('TC-03: Route Protection - Authenticated user should be redirected from login/register to home', async ({ page }) => {
+  test('TC-03: Route Protection - Authenticated user should be redirected from login/register to home', async ({ page }) => {
     const dummyJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwicm9sZSI6IkNVU1RPTUVSIn0.signature";
     const dummyUser = { id: '1', email: 'test@example.com', name: 'Test User', role: 'CUSTOMER' };
     

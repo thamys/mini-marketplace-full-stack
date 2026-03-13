@@ -1,116 +1,34 @@
 import { test, expect } from '@playwright/test';
+import {
+  MOCK_PRODUCT_1,
+  MOCK_PRODUCT_2,
+  MOCK_ORDER,
+} from './fixtures';
+import { setupCustomerSession } from './helpers/auth';
 
-const MOCK_JWT =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEiLCJlbWFpbCI6InVzZXJAbWFya2V0cGxhY2UuY29tIiwibmFtZSI6IlVzdWFyaW8gVGVzdGUiLCJyb2xlIjoiQ1VTVE9NRVIifQ.signature';
+const MOCK_PRODUCT = MOCK_PRODUCT_1;
 
-const MOCK_USER = {
-  id: 'user-1',
-  email: 'user@marketplace.com',
-  name: 'Usuario Teste',
-  role: 'CUSTOMER',
-};
-
-const MOCK_PRODUCT = {
-  id: 'prod-1',
-  name: 'Notebook Dell',
-  description: 'Um ótimo notebook',
-  price: '2500.00',
-  category: 'eletronicos',
-  stock: 5,
-  imageUrl: null,
-  createdAt: new Date().toISOString(),
-};
-
-const MOCK_PRODUCT_2 = {
-  id: 'prod-2',
-  name: 'Mouse Logitech',
-  description: 'Mouse sem fio',
-  price: '150.00',
-  category: 'perifericos',
-  stock: 10,
-  imageUrl: null,
-  createdAt: new Date().toISOString(),
-};
-
-const MOCK_ORDER = {
-  id: 'order-abc123de',
-  userId: 'user-1',
-  total: '2650.00',
-  status: 'PENDING',
-  createdAt: new Date().toISOString(),
-  items: [
-    {
-      id: 'item-1',
-      orderId: 'order-abc123de',
-      productId: MOCK_PRODUCT.id,
-      productName: MOCK_PRODUCT.name,
-      quantity: 1,
-      unitPrice: '2500.00',
-    },
-    {
-      id: 'item-2',
-      orderId: 'order-abc123de',
-      productId: MOCK_PRODUCT_2.id,
-      productName: MOCK_PRODUCT_2.name,
-      quantity: 1,
-      unitPrice: '150.00',
-    },
-  ],
-};
-
-async function setupAuthenticatedSession(page: import('@playwright/test').Page) {
-  page.setDefaultTimeout(60000);
-  await page.context().clearCookies();
-
-  await page.context().addCookies([
-    { name: 'auth_token', value: MOCK_JWT, url: 'http://localhost:3000' },
-  ]);
-
-  await page.route('**/api/auth/session', async (route) => {
-    const method = route.request().method();
-    if (method === 'GET') {
-      await route.fulfill({
-        status: 200,
-        body: JSON.stringify({ authenticated: true, user: MOCK_USER }),
-      });
-    } else {
-      await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
-    }
-  });
-
-  await page.route('**/api/products*', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        data: [MOCK_PRODUCT, MOCK_PRODUCT_2],
-        meta: { total: 2, page: 1, limit: 12, totalPages: 1 },
-      }),
-    });
-  });
-
-  await page.route(`**/api/products/${MOCK_PRODUCT.id}`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(MOCK_PRODUCT),
-    });
-  });
-
-  await page.route(`**/api/products/${MOCK_PRODUCT_2.id}`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(MOCK_PRODUCT_2),
-    });
-  });
-}
-
-test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
-  test.fixme('TC-11.E2E.1: Fluxo completo - adicionar produtos, finalizar pedido e ver histórico', async ({
+test.describe('Orders Flow (US-11 & US-12)', () => {
+  test('TC-11.E2E.1: Fluxo completo - adicionar produtos, finalizar pedido e ver histórico', async ({
     page,
   }) => {
-    await setupAuthenticatedSession(page);
+    await setupCustomerSession(page);
+
+    await page.route(`**/api/products/${MOCK_PRODUCT.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_PRODUCT),
+      });
+    });
+
+    await page.route(`**/api/products/${MOCK_PRODUCT_2.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_PRODUCT_2),
+      });
+    });
 
     await page.route('**/api/proxy/orders', async (route) => {
       const method = route.request().method();
@@ -175,7 +93,7 @@ test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
   test('TC-11.E2E.2: Persistência do carrinho em sessionStorage após reload', async ({
     page,
   }) => {
-    await setupAuthenticatedSession(page);
+    await setupCustomerSession(page);
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.getByTestId('add-to-cart-button').first().click();
@@ -186,10 +104,10 @@ test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
     await expect(page.getByTestId('cart-button')).toContainText('1');
   });
 
-  test.fixme('TC-11.E2E.3: Conflito de estoque ao abrir o carrinho — quantidade auto-ajustada', async ({
+  test('TC-11.E2E.3: Conflito de estoque ao abrir o carrinho — quantidade auto-ajustada', async ({
     page,
   }) => {
-    await setupAuthenticatedSession(page);
+    await setupCustomerSession(page);
 
     // Product starts with stock=5, but when drawer opens stock=1
     await page.route(`**/api/products/${MOCK_PRODUCT.id}`, async (route) => {
@@ -217,10 +135,19 @@ test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
     await expect(page.locator('body')).toContainText('ajustada', { timeout: 5000 });
   });
 
-  test.fixme('TC-11.E2E.4: Race condition — erro INSUFFICIENT_STOCK do backend ao finalizar', async ({
+  test('TC-11.E2E.4: Race condition — erro INSUFFICIENT_STOCK do backend ao finalizar', async ({
     page,
   }) => {
-    await setupAuthenticatedSession(page);
+    await setupCustomerSession(page);
+
+    // When drawer opens, stock check must pass (no conflicts) so checkout-button is enabled
+    await page.route(`**/api/products/${MOCK_PRODUCT.id}`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ...MOCK_PRODUCT, stock: 5 }),
+      });
+    });
 
     await page.route('**/api/proxy/orders', async (route) => {
       if (route.request().method() === 'POST') {
