@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// TODO: This suite is currently disabled because the product details page was moved to a new
+// route group and now includes cart integration that the tests don't cover yet.
+// Re-enable after updating selectors and adding cart-related assertions.
 test.describe.fixme('Product Details Page - E2E Tests', () => {
   test('TC-08.7.1: Acessar a página de detalhes de um produto existente exibe suas informações corretas', async ({ page }) => {
     const mockProduct = { id: '1', name: 'Notebook Test', price: 9000, category: 'Informática', description: 'Powerful laptop', stock: 10, imageUrl: null };

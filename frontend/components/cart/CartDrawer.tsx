@@ -195,7 +195,7 @@ export function CartDrawer() {
           {/* Overlay — rendered at body level to escape header stacking context */}
           {open && (
             <div
-              className="fixed inset-0 z-60 bg-black/50 animate-in fade-in-0 duration-200"
+              className="fixed inset-0 z-[60] bg-black/50 animate-in fade-in-0 duration-200"
               onClick={handleClose}
               aria-hidden="true"
             />
@@ -204,12 +204,13 @@ export function CartDrawer() {
           {/* Drawer */}
           <aside
             className={cn(
-              'fixed top-0 right-0 z-61 h-screen w-full max-w-[420px] bg-background shadow-2xl flex flex-col transition-transform duration-300 ease-in-out',
+              'fixed top-0 right-0 z-[61] h-screen w-full max-w-[420px] bg-background shadow-2xl flex flex-col transition-transform duration-300 ease-in-out',
               open ? 'translate-x-0' : 'translate-x-full',
             )}
             aria-label="Carrinho de compras"
             role="dialog"
-            aria-modal="true"
+            aria-modal={open ? 'true' : undefined}
+            aria-hidden={open ? undefined : 'true'}
           >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-5 py-4 bg-background/95">

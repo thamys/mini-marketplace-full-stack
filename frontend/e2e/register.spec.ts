@@ -48,6 +48,9 @@ test.describe('Register Page E2E', () => {
     await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
   });
 
+  // TODO: This test is disabled because it relies on session cookie-based mock auth that doesn't
+  // currently align with the updated getSession() flow. Re-enable once the auth mocking strategy
+  // is updated to work with the server-side session check.
   test.fixme('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
     const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' };
 

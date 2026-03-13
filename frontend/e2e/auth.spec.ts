@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// TODO: These tests are currently disabled because they are flaky in CI (require a running backend
+// and the middleware changes in this PR have not yet been fully stabilised in the test environment).
+// Track: stabilise mocks and re-enable in a follow-up PR.
 test.describe.fixme('Authentication Flow - Standardized', () => {
   test.beforeEach(async ({ page }) => {
     // Increase timeout for cold starts

@@ -66,13 +66,36 @@ export class OrdersService {
     }, 0);
 
     // Create order atomically: decrement stock + create order + create items
+    // Stock is re-validated inside the transaction to prevent race conditions
+    // where two concurrent checkouts could both pass the pre-check above.
     const order = await this.prisma.$transaction(async (tx) => {
-      // Decrement stock for each product
+      // Re-check and decrement stock atomically for each product.
+      // We use updateMany with a stock >= quantity guard; if no rows are
+      // affected the product ran out of stock between our pre-check and now.
       for (const item of dto.items) {
-        await tx.product.update({
-          where: { id: item.productId },
+        const result = await tx.product.updateMany({
+          where: { id: item.productId, stock: { gte: item.quantity } },
           data: { stock: { decrement: item.quantity } },
         });
+        if (result.count === 0) {
+          // Re-fetch to get the current stock for the error response
+          const current = await tx.product.findUnique({
+            where: { id: item.productId },
+            select: { name: true, stock: true },
+          });
+          throw new BadRequestException({
+            statusCode: 400,
+            error: 'INSUFFICIENT_STOCK',
+            details: [
+              {
+                productId: item.productId,
+                productName: current?.name ?? item.productId,
+                requested: item.quantity,
+                available: current?.stock ?? 0,
+              },
+            ],
+          });
+        }
       }
 
       return tx.order.create({

@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4000/api';
 
@@ -37,26 +36,10 @@ export async function getSession(): Promise<Session> {
       authenticated: true,
     };
   } catch {
-    // Fallback: If backend call fails (e.g. in E2E tests without real backend), 
-    // try to decode the JWT to provide basic user info for the UI
-    try {
-      const decoded = jwtDecode<User & { sub?: string }>(token);
-      // Basic validation: ensure it has at least a role
-      if (decoded?.role) {
-        return {
-          user: {
-            id: decoded.id || decoded.sub || '0',
-            email: decoded.email || '',
-            role: decoded.role,
-            name: decoded.name || 'User'
-          },
-          authenticated: true,
-        };
-      }
-    } catch {
-      // Ignore decode errors
-    }
-    
+    // Backend unreachable or token invalid — treat as unauthenticated.
+    // NOTE: We intentionally do NOT fall back to jwtDecode here because
+    // jwt-decode does not verify the token signature, which would allow a
+    // forged token to bypass frontend route gating (e.g. faking ADMIN role).
     return { user: null, authenticated: false };
   }
 }
