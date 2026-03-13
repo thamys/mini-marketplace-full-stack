@@ -27,7 +27,9 @@ async function main() {
     console.log(`Admin user already exists: ${existingUser.id}`);
   }
 
-  console.log('Resetting products table...');
+  console.log('Resetting database tables...');
+  await prisma.orderItem.deleteMany({});
+  await prisma.order.deleteMany({});
   await prisma.product.deleteMany({});
 
   console.log('Seeding 100 products...');

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CartDrawer } from '@/components/cart/CartDrawer';
 
 function getInitials(email: string): string {
   const [localPart] = email.split('@');
@@ -24,12 +25,35 @@ function getInitials(email: string): string {
 export default function Header() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
   };
 
+  const isAdmin = user?.role === 'ADMIN' || pathname.startsWith('/admin');
   const initials = user ? getInitials(user.email) : '';
+
+  if (isAdmin) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="container px-8 flex h-16 max-w-screen-2xl items-center justify-between">
+          <Link href="/" className="font-bold text-lg" aria-label="Marketplace - Ir para a página inicial">
+            Marketplace
+          </Link>
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-1 rounded">ADMIN</span>
+            <button 
+              onClick={handleLogout}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -43,14 +67,15 @@ export default function Header() {
             <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
           )}
           
+          <Link
+            href="/"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Produtos
+          </Link>
+
           {!loading && !user && (
             <>
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Produtos
-              </Link>
               <Link
                 href="/login"
                 className="text-sm font-medium hover:text-primary transition-colors"
@@ -68,37 +93,53 @@ export default function Header() {
 
           {!loading && user && (
             <>
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Produtos
-              </Link>
-
               {user.role === 'ADMIN' && (
-                <Link
-                  href="/admin/products"
-                  className="text-sm font-medium hover:text-primary transition-colors"
-                >
-                  Gerenciar Produtos
-                </Link>
+                <>
+                  <Link
+                    href="/admin/products"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                  >
+                    Gerenciar Produtos
+                  </Link>
+                  <Link
+                    href="/admin/orders"
+                    className="text-sm font-medium hover:text-primary transition-colors"
+                  >
+                    Gerenciar Pedidos
+                  </Link>
+                </>
               )}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
-                  {initials}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
-                    Meu Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {user.role !== 'ADMIN' && (
+                <Link
+                  href="/orders"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
+                  Meus Pedidos
+                </Link>
+              )}
             </>
+          )}
+
+          {(!user || user.role !== 'ADMIN') && (
+            <CartDrawer />
+          )}
+
+          {!loading && user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
+                {initials}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
+                  Meu Perfil
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </nav>
       </div>

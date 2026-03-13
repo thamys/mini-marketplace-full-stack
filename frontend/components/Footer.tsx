@@ -1,8 +1,28 @@
+'use client';
+
 import Link from 'next/link';
 import { Github, Linkedin } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === 'ADMIN' || pathname.startsWith('/admin');
+
+  if (isAdmin) {
+    return (
+      <footer className="border-t bg-background px-8 py-4">
+        <div className="container max-w-screen-2xl flex justify-center">
+          <p className="text-xs text-muted-foreground">
+            © {currentYear} Marketplace. Todos os direitos reservados.
+          </p>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="border-t bg-background px-8">

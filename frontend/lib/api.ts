@@ -9,8 +9,17 @@ export const api = axios.create({
 });
 
 // Via Next.js proxy - authenticated routes
+const getBaseUrl = () => {
+  if (typeof globalThis.window !== 'undefined') {
+    return '/api/proxy';
+  }
+  // On server (SSR/Pre-render), use absolute URL if available, otherwise just use a placeholder to avoid crash
+  // Note: During pre-render, this will still fail the fetch, which is expected.
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000/api/proxy';
+};
+
 export const bffApi = axios.create({
-  baseURL: '/api/proxy',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },

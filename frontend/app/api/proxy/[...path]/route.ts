@@ -37,7 +37,7 @@ async function handleProxyRequest(
       },
       ...(body && { data: body }),
       validateStatus: () => true,
-      timeout: 1000,
+      timeout: 10000,
     };
 
     const response = await axios(config);
@@ -67,4 +67,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   return handleProxyRequest(request, 'DELETE');
+}
+
+export async function PATCH(request: NextRequest) {
+  return handleProxyRequest(request, 'PATCH');
 }

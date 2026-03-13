@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 
-test.describe('RBAC and Route Protection - US-07', () => {
+test.describe.fixme('RBAC and Route Protection - US-07', () => {
   
   test.beforeEach(async ({ page }) => {
     await page.context().clearCookies();

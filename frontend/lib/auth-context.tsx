@@ -50,12 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = React.useCallback(async (token: string, userData: User) => {
     await axios.post('/api/auth/session', { token });
     setUser(userData);
-    router.push('/');
+    router.refresh(); // Force revalidation of server components
+    router.push(userData.role === 'ADMIN' ? '/admin' : '/');
   }, [router]);
 
   const logout = React.useCallback(async () => {
     await axios.delete('/api/auth/session');
     setUser(null);
+    router.refresh(); // Force revalidation of server components
     router.push('/login');
   }, [router]);
 
