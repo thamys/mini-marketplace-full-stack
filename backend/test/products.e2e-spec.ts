@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { Role } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
+import { productPayload } from './helpers/factories';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -52,14 +53,7 @@ describe('ProductsController (e2e)', () => {
 
   describe('POST /products', () => {
     it('TC-09.2.1: POST com token ADMIN + payload válido → 201', async () => {
-      const payload = {
-        name: 'Product E2E',
-        description: 'Description',
-        price: 100,
-        category: 'Electronics',
-        stock: 10,
-        imageUrl: 'http://test.com/img.jpg',
-      };
+      const payload = productPayload({ name: 'Product E2E' });
 
       const response = await request(
         app.getHttpServer() as string | (() => void),
@@ -98,13 +92,7 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('TC-09.2.3: POST com token CUSTOMER → 403', async () => {
-      const payload = {
-        name: 'Fail Product',
-        description: 'Desc',
-        price: 10,
-        category: 'Cat',
-        stock: 1,
-      };
+      const payload = productPayload({ name: 'Fail Product', description: 'Desc', category: 'Cat', stock: 1 });
 
       const response = await request(
         app.getHttpServer() as string | (() => void),
@@ -120,13 +108,7 @@ describe('ProductsController (e2e)', () => {
   describe('PUT /products/:id', () => {
     it('TC-09.2.4: PUT com id válido + token ADMIN → 200 com produto atualizado', async () => {
       const product = await prisma.product.create({
-        data: {
-          name: 'To Update',
-          description: 'Desc',
-          price: 50,
-          category: 'Cat',
-          stock: 5,
-        },
+        data: productPayload({ name: 'To Update', description: 'Desc', price: 50, category: 'Cat', stock: 5 }),
       });
 
       const updatePayload = { price: 75 };
@@ -151,13 +133,7 @@ describe('ProductsController (e2e)', () => {
   describe('DELETE /products/:id', () => {
     it('TC-09.2.5: DELETE com id válido + token ADMIN → 204', async () => {
       const product = await prisma.product.create({
-        data: {
-          name: 'To Delete',
-          description: 'Desc',
-          price: 50,
-          category: 'Cat',
-          stock: 5,
-        },
+        data: productPayload({ name: 'To Delete', description: 'Desc', price: 50, category: 'Cat', stock: 5 }),
       });
 
       const response = await request(

@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import * as bcrypt from 'bcrypt';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from './../src/prisma/prisma.service';
+import { userPayload } from './helpers/factories';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -32,11 +34,7 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/register (POST)', () => {
     it('TC-E2E-B01: should register a new user (201)', async () => {
-      const payload = {
-        name: 'E2E User',
-        email: 'e2e@test.com',
-        password: 'password123',
-      };
+      const payload = userPayload({ name: 'E2E User', email: 'e2e@test.com' });
 
       const response = await request(
         app.getHttpServer() as string | (() => void),
@@ -61,11 +59,7 @@ describe('AuthController (e2e)', () => {
     });
 
     it('TC-E2E-B02: should return 409 if email already exists', async () => {
-      const payload = {
-        name: 'E2E User',
-        email: 'e2e@test.com',
-        password: 'password123',
-      };
+      const payload = userPayload({ name: 'E2E User', email: 'e2e@test.com' });
 
       await request(app.getHttpServer() as string | (() => void))
         .post('/auth/register')
@@ -89,15 +83,15 @@ describe('AuthController (e2e)', () => {
 
   describe('/auth/login (POST)', () => {
     beforeAll(async () => {
-      // Ensure test user exists for login tests
+      // Ensure test user exists for login tests with a valid hash
+      const passwordHash = await bcrypt.hash('password123', 10);
       await prisma.user.upsert({
         where: { email: 'e2e@test.com' },
-        update: {},
+        update: { passwordHash },
         create: {
           name: 'E2E User',
           email: 'e2e@test.com',
-          passwordHash:
-            '$2b$10$EPf9avv.WnJ7FmS6mHhO.uWx6lJmG2zQzFz0zFz0zFz0zFz0zFz0z', // "password123"
+          passwordHash,
         },
       });
     });
