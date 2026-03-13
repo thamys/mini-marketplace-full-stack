@@ -28,7 +28,7 @@ const productSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
   price: z.number().positive('Preço deve ser positivo'),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  stock: z.number().int().min(0, 'Estoque não pode ser negativo'),
+  stock: z.coerce.number().int().min(0, 'Estoque não pode ser negativo'),
   imageUrl: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
 });
 
@@ -142,7 +142,7 @@ export function ProductForm({
                   <Input
                     type="number"
                     {...field}
-                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) => field.onChange(e.target.value)}
                   />
                 </FormControl>
                 <FormMessage />

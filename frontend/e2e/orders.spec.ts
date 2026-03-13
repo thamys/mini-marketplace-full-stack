@@ -204,6 +204,10 @@ test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
     await page.getByTestId('add-to-cart-button').first().click();
 
     // Manually set quantity to 3 via sessionStorage before opening drawer
+    // TODO: The cart context uses key `marketplace_cart_${userId}` for authenticated users
+    // (e.g. `marketplace_cart_user-1` for MOCK_USER.id) and `marketplace_cart_guest` for guests.
+    // This test writes to the wrong key (`marketplace_cart`) so it won't affect real cart state.
+    // Fix this test by using the correct key once it is re-enabled.
     await page.evaluate((productId) => {
       const cart = JSON.parse(sessionStorage.getItem('marketplace_cart') ?? '[]');
       const updated = cart.map((i: { productId: string }) =>

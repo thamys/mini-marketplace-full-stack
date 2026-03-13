@@ -20,7 +20,7 @@ export default async function AdminLayout({
         <header className="h-16 border-b flex items-center px-8 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
           <h1 className="font-semibold text-lg">Painel Administrativo</h1>
         </header>
-        <main className="flex-1 p-8">
+        <main id="main-content" className="flex-1 p-8">
           {children}
         </main>
         <footer className="h-14 border-t flex items-center px-8 text-sm text-muted-foreground">

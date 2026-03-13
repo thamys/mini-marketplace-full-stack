@@ -50,23 +50,7 @@ async function getDashboardData() {
     };
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
-    // Fallback for E2E tests/development without live backend
-    return {
-      stats: {
-        productsCount: 2, // Matches common E2E test expectation
-        ordersCount: 1,
-        totalRevenue: 30
-      },
-      recentOrders: [
-        { 
-          id: 'mock-1', 
-          total: 30, 
-          status: 'COMPLETED', 
-          createdAt: new Date().toISOString(),
-          user: { email: 'user@example.com' }
-        }
-      ]
-    };
+    return null;
   }
 }
 

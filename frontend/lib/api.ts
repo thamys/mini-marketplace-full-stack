@@ -32,8 +32,12 @@ const errorHandler = (error: AxiosError<{ message?: string }>) => {
     console.error(`[SSR API ERROR] ${error.config?.method?.toUpperCase()} ${error.config?.url}: ${message}`);
   }
 
-  const customError = new Error(message) as Error & { status?: number };
+  const customError = new Error(message) as Error & { status?: number; response?: { data?: unknown } };
   customError.status = error.response?.status;
+  // Preserve the original response data so callers (e.g. isInsufficientStockError) can inspect it
+  if (error.response) {
+    customError.response = { data: error.response.data };
+  }
 
   return Promise.reject(customError);
 };
