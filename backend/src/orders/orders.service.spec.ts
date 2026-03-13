@@ -93,6 +93,7 @@ describe('OrdersService', () => {
       expect(result).toEqual(createdOrder);
       expect(txMock.order.create).toHaveBeenCalledWith(
         expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           data: expect.objectContaining({
             userId: 'user-1',
             total: new Decimal(200),
@@ -117,6 +118,7 @@ describe('OrdersService', () => {
 
       expect(txMock.order.create).toHaveBeenCalledWith(
         expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           data: expect.objectContaining({
             items: {
               create: [

@@ -70,6 +70,7 @@ describe('OrdersController', () => {
       );
 
       expect(result).toEqual(mockOrder);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.create).toHaveBeenCalledWith('user-1', {
         items: [{ productId: 'prod-1', quantity: 2 }],
       });
@@ -90,7 +91,8 @@ describe('OrdersController', () => {
         .useValue({ canActivate: () => false })
         .compile();
 
-      const guardedController = guardModule.get<OrdersController>(OrdersController);
+      const guardedController =
+        guardModule.get<OrdersController>(OrdersController);
 
       // When guard returns false, NestJS throws 403 by default in unit context,
       // but the real HTTP layer returns 401. We just verify service is not called.
@@ -136,6 +138,7 @@ describe('OrdersController', () => {
       const result = await controller.findOrders({ user: mockUser });
 
       expect(result).toEqual([mockOrder]);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.findByUser).toHaveBeenCalledWith('user-1');
     });
 
@@ -146,6 +149,7 @@ describe('OrdersController', () => {
       const result = await controller.findOrders({ user: adminUser });
 
       expect(result).toEqual([mockOrder]);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.findAll).toHaveBeenCalled();
     });
   });

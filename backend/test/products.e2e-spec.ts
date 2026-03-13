@@ -36,11 +36,16 @@ describe('ProductsController (e2e)', () => {
       role: Role.CUSTOMER,
     });
 
-    // Clean up products
+    // Clean up products and related items
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
     await prisma.product.deleteMany();
   });
 
   afterAll(async () => {
+    // Clean up products and related items
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
     await prisma.product.deleteMany();
     await app.close();
   });

@@ -195,7 +195,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } else {
       dispatch({ type: 'LOAD', payload: loadFromStorage(userId) });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   // Persist to sessionStorage whenever items change

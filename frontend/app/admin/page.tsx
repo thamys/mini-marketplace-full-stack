@@ -38,8 +38,7 @@ async function getDashboardData() {
     const products = productsRes.data.items || productsRes.data;
     const orders = ordersRes.data;
 
-    const totalRevenue = orders.reduce((sum: number, order: any) => sum + Number(order.total), 0);
-    const recentOrders = orders.slice(0, 5);
+    const totalRevenue = orders.reduce((sum: number, order: { total: number | string }) => sum + Number(order.total), 0);
 
     return {
       stats: {
@@ -47,7 +46,7 @@ async function getDashboardData() {
         ordersCount: orders.length,
         totalRevenue
       },
-      recentOrders
+      recentOrders: orders.slice(0, 5)
     };
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
@@ -133,12 +132,18 @@ export default async function AdminPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentOrders.map((order: any) => (
+                {recentOrders.map((order: { 
+                  id: string; 
+                  user: { email: string }; 
+                  createdAt: string; 
+                  total: number | string; 
+                  status: string 
+                }) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-mono text-xs">{order.id.slice(0, 8)}...</TableCell>
                     <TableCell>{order.user.email}</TableCell>
                     <TableCell>{new Date(order.createdAt).toLocaleDateString('pt-BR')}</TableCell>
-                    <TableCell>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(order.total)}</TableCell>
+                    <TableCell>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(order.total))}</TableCell>
                     <TableCell>
                       <Badge variant={order.status === 'COMPLETED' ? 'default' : 'secondary'}>
                         {order.status}

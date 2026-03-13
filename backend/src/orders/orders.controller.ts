@@ -52,7 +52,8 @@ export class OrdersController {
   @Roles(Role.ADMIN)
   updateStatus(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(UpdateOrderStatusDtoSchema)) dto: UpdateOrderStatusDto,
+    @Body(new ZodValidationPipe(UpdateOrderStatusDtoSchema))
+    dto: UpdateOrderStatusDto,
   ) {
     return this.ordersService.updateStatus(id, dto.status);
   }

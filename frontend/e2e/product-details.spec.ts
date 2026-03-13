@@ -30,8 +30,8 @@ test.describe('Product Details Page - E2E Tests', () => {
     // Verify title matches using standardized testid
     await expect(page.getByTestId('product-name')).toHaveText(mockProduct.name, { timeout: 3000 });
     
-    // Verify Buy button exists using standardized testid
-    await expect(page.getByTestId('buy-button')).toBeVisible();
+    // Verify Add to cart button exists using standardized testid
+    await expect(page.getByTestId('add-to-cart-button')).toBeVisible();
   });
 
   test('TC-08.7.2: Acessar a página de detalhes de um produto inexistente exibe mensagem de não encontrado', async ({ page }) => {

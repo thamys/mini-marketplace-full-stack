@@ -57,7 +57,7 @@ function ProductDetailContent({ id }: { id: string }) {
                 fill
                 className="object-cover transition-opacity duration-300"
                 priority
-                onLoadingComplete={(img) => {
+                onLoadingComplete={() => {
                   const overlay = document.getElementById(`detail-loading-overlay-${product.id}`);
                   if (overlay) overlay.style.opacity = '0';
                 }}

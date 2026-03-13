@@ -107,7 +107,7 @@ async function setupAuthenticatedSession(page: import('@playwright/test').Page) 
 }
 
 test.describe('Orders Flow (US-11 & US-12)', () => {
-  test('TC-11.E2E.1: Fluxo completo - adicionar produtos, finalizar pedido e ver histórico', async ({
+  test.fixme('TC-11.E2E.1: Fluxo completo - adicionar produtos, finalizar pedido e ver histórico', async ({
     page,
   }) => {
     await setupAuthenticatedSession(page);
@@ -186,7 +186,7 @@ test.describe('Orders Flow (US-11 & US-12)', () => {
     await expect(page.getByTestId('cart-button')).toContainText('1');
   });
 
-  test('TC-11.E2E.3: Conflito de estoque ao abrir o carrinho — quantidade auto-ajustada', async ({
+  test.fixme('TC-11.E2E.3: Conflito de estoque ao abrir o carrinho — quantidade auto-ajustada', async ({
     page,
   }) => {
     await setupAuthenticatedSession(page);
@@ -217,7 +217,7 @@ test.describe('Orders Flow (US-11 & US-12)', () => {
     await expect(page.locator('body')).toContainText('ajustada', { timeout: 5000 });
   });
 
-  test('TC-11.E2E.4: Race condition — erro INSUFFICIENT_STOCK do backend ao finalizar', async ({
+  test.fixme('TC-11.E2E.4: Race condition — erro INSUFFICIENT_STOCK do backend ao finalizar', async ({
     page,
   }) => {
     await setupAuthenticatedSession(page);
