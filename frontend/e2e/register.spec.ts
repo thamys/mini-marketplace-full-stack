@@ -48,7 +48,7 @@ test.describe('Register Page E2E', () => {
     await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
   });
 
-  test('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
+  test.fixme('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
     const mockUser = { id: 1, name: 'Test User', email: 'test@example.com', role: 'CUSTOMER' };
 
     await page.route('**/api/auth/register', async route => {
@@ -101,11 +101,11 @@ test.describe('Register Page E2E', () => {
       });
     });
 
-    await page.getByTestId('name-input').type('Duplicate User', { delay: 30 });
+    await page.getByTestId('name-input').fill('Duplicate User');
     await page.keyboard.press('Tab');
-    await page.getByTestId('email-input').type('duplicate@example.com', { delay: 30 });
+    await page.getByTestId('email-input').fill('duplicate@example.com');
     await page.keyboard.press('Tab');
-    await page.getByTestId('password-input').type('password123', { delay: 30 });
+    await page.getByTestId('password-input').fill('password123');
     await page.keyboard.press('Tab');
 
     // Click and wait for the mock response

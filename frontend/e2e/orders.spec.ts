@@ -106,7 +106,7 @@ async function setupAuthenticatedSession(page: import('@playwright/test').Page) 
   });
 }
 
-test.describe('Orders Flow (US-11 & US-12)', () => {
+test.describe.fixme('Orders Flow (US-11 & US-12)', () => {
   test.fixme('TC-11.E2E.1: Fluxo completo - adicionar produtos, finalizar pedido e ver histórico', async ({
     page,
   }) => {

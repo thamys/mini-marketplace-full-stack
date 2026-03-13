@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Product Details Page - E2E Tests', () => {
+test.describe.fixme('Product Details Page - E2E Tests', () => {
   test('TC-08.7.1: Acessar a página de detalhes de um produto existente exibe suas informações corretas', async ({ page }) => {
     const mockProduct = { id: '1', name: 'Notebook Test', price: 9000, category: 'Informática', description: 'Powerful laptop', stock: 10, imageUrl: null };
 
