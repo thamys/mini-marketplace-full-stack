@@ -148,7 +148,7 @@ export function CartDrawer() {
         open={!!pendingRemove}
         onOpenChange={(isOpen) => { if (!isOpen) setPendingRemove(null); }}
       >
-        <AlertDialogContent size="sm">
+        <AlertDialogContent size="sm" className="z-200">
           <AlertDialogHeader>
             <AlertDialogTitle>Remover item?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -204,7 +204,7 @@ export function CartDrawer() {
           {/* Drawer */}
           <aside
             className={cn(
-              'fixed top-0 right-0 z-61 h-screen w-full max-w-[420px] bg-background shadow-2xl flex flex-col transition-transform duration-300 ease-in-out',
+              'fixed top-0 right-0 z-61 h-screen w-[80vw] sm:w-full max-w-[420px] bg-background shadow-2xl flex flex-col transition-transform duration-300 ease-in-out',
               open ? 'translate-x-0' : 'translate-x-full',
             )}
             aria-label="Carrinho de compras"
