@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { setupCustomerSession, setupAdminSession } from './helpers/auth';
+import { MOCK_PAGINATED_PRODUCTS } from './fixtures';
 
 test.describe('Authentication Flow - Standardized', () => {
   test.beforeEach(async ({ page }) => {
@@ -133,6 +135,81 @@ test.describe('Authentication Flow - Standardized', () => {
 
     // Wait for the register page to load and find the link back to login
     await page.click('text=Entre aqui');
+    await expect(page).toHaveURL('/login');
+  });
+});
+
+test.describe('Logout Flow', () => {
+  test('TC-05: Logout de customer — limpa sessão e redireciona para /login', async ({ page }) => {
+    await setupCustomerSession(page);
+
+    // Mock DELETE /api/auth/session (chamado pelo logout)
+    let logoutCalled = false;
+    await page.route('**/api/auth/session', async (route) => {
+      if (route.request().method() === 'DELETE') {
+        logoutCalled = true;
+        await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Mock /api/products para o catálogo carregar sem erros
+    await page.route('**/api/products*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_PAGINATED_PRODUCTS),
+      });
+    });
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // Customer vê header com dropdown de usuário.
+    // getInitials('user@marketplace.com') → 'U'
+    // O DropdownMenuTrigger renderiza as iniciais como conteúdo de texto — aguardar hydration
+    const avatarTrigger = page.locator('header').getByText('U', { exact: true });
+    await expect(avatarTrigger).toBeVisible({ timeout: 15000 });
+    await avatarTrigger.click();
+    await page.getByRole('menuitem', { name: 'Sair' }).click();
+
+    // Confirmar que DELETE /api/auth/session foi disparado
+    await page.waitForURL('/login', { timeout: 8000 });
+    expect(logoutCalled).toBe(true);
+    await expect(page).toHaveURL('/login');
+  });
+
+  test('TC-06: Logout de admin — limpa sessão e redireciona para /login', async ({ page }) => {
+    await setupAdminSession(page);
+
+    // Mock DELETE /api/auth/session
+    let logoutCalled = false;
+    await page.route('**/api/auth/session', async (route) => {
+      if (route.request().method() === 'DELETE') {
+        logoutCalled = true;
+        await route.fulfill({ status: 200, body: JSON.stringify({ success: true }) });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Mock GET /api/proxy/orders (admin orders page)
+    await page.route('**/api/proxy/orders*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([]),
+      });
+    });
+
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
+
+    // Admin usa header simplificado com botão "Sair" diretamente visível
+    await page.getByRole('button', { name: 'Sair' }).click();
+
+    // Confirmar redirecionamento para /login
+    await page.waitForURL('/login', { timeout: 8000 });
+    expect(logoutCalled).toBe(true);
     await expect(page).toHaveURL('/login');
   });
 });
