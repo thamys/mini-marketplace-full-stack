@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react';
+import React from 'react';
+import { createPortal } from 'react-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +29,16 @@ export default function Header() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => { setMounted(true); }, []);
+
+  // Fecha menu ao navegar
+  React.useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const handleLogout = async () => {
+    setMenuOpen(false);
     await logout();
   };
 
@@ -37,13 +48,13 @@ export default function Header() {
   if (isAdmin) {
     return (
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="container px-8 flex h-16 max-w-screen-2xl items-center justify-between">
+        <div className="container mx-auto px-6 md:px-8 flex h-16 max-w-7xl items-center justify-between">
           <Link href="/" className="font-bold text-lg" aria-label="Marketplace - Ir para a página inicial">
             Marketplace
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-1 rounded">ADMIN</span>
-            <button 
+            <button
               onClick={handleLogout}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -56,93 +67,145 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container px-8 flex h-16 max-w-screen-2xl items-center justify-between">
-        <Link href="/" className="font-bold text-lg" aria-label="Marketplace - Ir para a página inicial">
-          Marketplace
-        </Link>
-
-        <nav className="flex items-center gap-6" aria-label="Menu Principal">
-          {loading && (
-            <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
-          )}
-          
-          <Link
-            href="/"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Produtos
+    <>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="container mx-auto px-6 md:px-8 h-16 max-w-7xl flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]">
+          {/* Logo — esquerda */}
+          <Link href="/" className="font-bold text-lg md:justify-self-start" aria-label="Marketplace - Ir para a página inicial">
+            Marketplace
           </Link>
 
-          {!loading && !user && (
-            <>
-              <Link
-                href="/login"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Entrar
-              </Link>
-              <Link
-                href="/register"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Registrar
-              </Link>
-            </>
-          )}
+          {/* Nav — centro (desktop only) */}
+          <nav className="hidden md:flex items-center gap-6" aria-label="Menu Principal">
+            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+              Produtos
+            </Link>
 
-          {!loading && user && (
-            <>
-              {user.role === 'ADMIN' && (
-                <>
-                  <Link
-                    href="/admin/products"
-                    className="text-sm font-medium hover:text-primary transition-colors"
-                  >
-                    Gerenciar Produtos
-                  </Link>
-                  <Link
-                    href="/admin/orders"
-                    className="text-sm font-medium hover:text-primary transition-colors"
-                  >
-                    Gerenciar Pedidos
-                  </Link>
-                </>
-              )}
-
-              {user.role !== 'ADMIN' && (
-                <Link
-                  href="/orders"
-                  className="text-sm font-medium hover:text-primary transition-colors"
-                >
-                  Meus Pedidos
+            {!loading && !user && (
+              <>
+                <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
+                  Entrar
                 </Link>
+                <Link href="/register" className="text-sm font-medium hover:text-primary transition-colors">
+                  Registrar
+                </Link>
+              </>
+            )}
+
+            {!loading && user && user.role !== 'ADMIN' && (
+              <Link href="/orders" className="text-sm font-medium hover:text-primary transition-colors">
+                Meus Pedidos
+              </Link>
+            )}
+          </nav>
+
+          {/* Ações — direita */}
+          <div className="flex items-center gap-2 md:gap-3 md:justify-self-end">
+            {/* Carrinho e avatar (desktop) */}
+            <div className="hidden md:flex items-center gap-3">
+              {(!user || user.role !== 'ADMIN') && <CartDrawer />}
+
+              {!loading && user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
+                    {initials}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
+                      Meu Perfil
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      Sair
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
-            </>
-          )}
+            </div>
 
-          {(!user || user.role !== 'ADMIN') && (
-            <CartDrawer />
-          )}
+            {/* Carrinho (mobile — sempre visível) */}
+            <div className="md:hidden">
+              {(!user || user.role !== 'ADMIN') && <CartDrawer />}
+            </div>
 
-          {!loading && user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
-                {initials}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer">
+            {/* Hambúrguer (mobile) */}
+            <button
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile menu — portal */}
+      {mounted && menuOpen && createPortal(
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/40"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <nav
+            className="fixed top-16 left-0 right-0 z-41 bg-background border-b shadow-lg px-6 py-4 flex flex-col gap-1"
+            aria-label="Menu mobile"
+          >
+            <Link
+              href="/"
+              className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+            >
+              Produtos
+            </Link>
+
+            {!loading && !user && (
+              <>
+                <Link
+                  href="/login"
+                  className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                >
+                  Entrar
+                </Link>
+                <Link
+                  href="/register"
+                  className="py-3 text-sm font-medium hover:text-primary transition-colors"
+                >
+                  Registrar
+                </Link>
+              </>
+            )}
+
+            {!loading && user && user.role !== 'ADMIN' && (
+              <Link
+                href="/orders"
+                className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+              >
+                Meus Pedidos
+              </Link>
+            )}
+
+            {!loading && user && (
+              <>
+                <Link
+                  href="/profile"
+                  className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                >
                   Meu Perfil
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="py-3 text-sm font-medium text-left text-destructive hover:opacity-80 transition-opacity"
+                >
                   Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </nav>
-      </div>
-    </header>
+                </button>
+              </>
+            )}
+          </nav>
+        </>,
+        document.body,
+      )}
+    </>
   );
 }

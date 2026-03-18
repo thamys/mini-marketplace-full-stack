@@ -14,8 +14,8 @@ export default function Footer() {
 
   if (isAdmin) {
     return (
-      <footer className="border-t bg-background px-8 py-4">
-        <div className="container max-w-screen-2xl flex justify-center">
+      <footer className="border-t bg-background w-full">
+        <div className="container mx-auto max-w-7xl px-6 md:px-8 py-4 flex justify-center">
           <p className="text-xs text-muted-foreground">
             © {currentYear} Marketplace. Todos os direitos reservados.
           </p>
@@ -25,9 +25,10 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t bg-background px-8">
-      <div className="container max-w-screen-2xl py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+    <footer className="border-t bg-background w-full">
+      <div className="container mx-auto max-w-7xl px-6 md:px-8 py-6 md:py-8">
+        {/* Desktop: 3 colunas */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8 mb-8">
           <div>
             <h3 className="font-semibold text-lg mb-4">Marketplace</h3>
             <p className="text-sm text-muted-foreground">
@@ -81,9 +82,34 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="border-t pt-8">
+        {/* Mobile: simplificado */}
+        <div className="flex md:hidden items-center justify-between mb-4">
+          <span className="font-semibold">Marketplace</span>
+          <div className="flex gap-4">
+            <a
+              href="https://github.com/thamys"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="GitHub"
+            >
+              <Github className="w-5 h-5" />
+            </a>
+            <a
+              href="https://linkedin.com/in/thamysferreira"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+
+        <div className="border-t pt-4 md:pt-6">
           <p className="text-xs text-muted-foreground text-center">
-            © {currentYear} Projeto Portfolio. Este é um projeto full-stack de desenvolvimento web construído para demonstrar padrões arquiteturais modernos e melhores práticas.{' '}
+            © {currentYear} Projeto Portfolio.{' '}
             <Link
               href="https://github.com/thamys"
               target="_blank"
