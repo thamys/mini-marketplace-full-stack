@@ -17,6 +17,7 @@ function ProductDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const { addItem, updateQuantity, items } = useCart();
   const [justAdded, setJustAdded] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
 
   const { data: product } = useSuspenseQuery({
     queryKey: ['product', id],
@@ -33,7 +34,7 @@ function ProductDetailContent({ id }: { id: string }) {
   }).format(Number(product.price));
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div>
       <div className="mb-6">
         <Button
           variant="ghost"
@@ -55,18 +56,14 @@ function ProductDetailContent({ id }: { id: string }) {
                 src={product.imageUrl}
                 alt={`Foto do produto ${product.name}`}
                 fill
-                className="object-cover transition-opacity duration-300"
+                className="object-cover"
                 priority
-                onLoadingComplete={() => {
-                  const overlay = document.getElementById(`detail-loading-overlay-${product.id}`);
-                  if (overlay) overlay.style.opacity = '0';
-                }}
+                onLoad={() => setImageLoaded(true)}
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
-              <div 
-                id={`detail-loading-overlay-${product.id}`}
-                className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800 animate-pulse transition-opacity duration-500 pointer-events-none"
-              />
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800 animate-pulse pointer-events-none" />
+              )}
             </div>
           ) : (
             <div className="flex h-full items-center justify-center text-zinc-400" aria-hidden="true">
@@ -178,7 +175,7 @@ function ProductDetailContent({ id }: { id: string }) {
 function ProductNotFound() {
   const router = useRouter();
   return (
-    <div className="container mx-auto py-20 px-4 text-center mt-10" data-testid="page-error">
+    <div className="py-12 text-center" data-testid="page-error">
       <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
       <p className="mb-8 text-zinc-600">O produto que você está procurando não existe ou foi removido.</p>
       <Button onClick={() => router.push('/')} className="px-6 py-2">

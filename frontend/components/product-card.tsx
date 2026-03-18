@@ -28,6 +28,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addItem, removeItem, updateQuantity, items } = useCart();
   const [justAdded, setJustAdded] = React.useState(false);
   const [confirmRemove, setConfirmRemove] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
 
   const cartItem = items.find((i) => i.productId === product.id);
   const inCart = !!cartItem;
@@ -106,35 +107,13 @@ export function ProductCard({ product }: ProductCardProps) {
                   src={product.imageUrl}
                   alt={`Foto do produto ${product.name}`}
                   fill
-                  className={cn(
-                    "object-cover transition-all duration-300 group-hover:scale-105",
-                    "data-[loading=true]:scale-110 data-[loading=true]:blur-sm"
-                  )}
-                  onLoadingComplete={(img) => img.setAttribute('data-loading', 'false')}
-                  data-loading="true"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  onLoad={() => setImageLoaded(true)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div 
-                  className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800 animate-pulse transition-opacity duration-500 pointer-events-none"
-                  id={`loading-overlay-${product.id}`}
-                />
-                <script
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      (function() {
-                        const img = document.currentScript.previousElementSibling.previousElementSibling.querySelector('img');
-                        const overlay = document.currentScript.previousElementSibling;
-                        if (img && img.complete) {
-                          overlay.style.opacity = '0';
-                        } else if (img) {
-                          img.addEventListener('load', function() {
-                            overlay.style.opacity = '0';
-                          });
-                        }
-                      })();
-                    `,
-                  }}
-                />
+                {!imageLoaded && (
+                  <div className="absolute inset-0 bg-zinc-200 dark:bg-zinc-800 animate-pulse pointer-events-none" />
+                )}
               </div>
             ) : (
               <div className="flex h-full items-center justify-center text-zinc-400" aria-hidden="true">

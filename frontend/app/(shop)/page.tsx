@@ -72,8 +72,7 @@ function ErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => void 
 
 export default function CatalogPage() {
   return (
-    <main className="container mx-auto py-8 px-4 md:px-6" id="main-content" aria-labelledby="catalog-title">
-      <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-8" aria-labelledby="catalog-title">
         <div>
           <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">Catálogo de Produtos</h1>
           <p className="text-muted-foreground mt-2 text-lg">
@@ -90,7 +89,6 @@ export default function CatalogPage() {
             <CatalogContent />
           </Suspense>
         </ErrorBoundary>
-      </div>
-    </main>
+    </div>
   );
 }
