@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Plus, Minus, Check } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check, PackageX } from 'lucide-react';
 import { Product } from '@/lib/api/products';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Button } from './ui/button';
@@ -30,6 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [confirmRemove, setConfirmRemove] = React.useState(false);
   const [imageLoaded, setImageLoaded] = React.useState(false);
 
+  const outOfStock = product.stock === 0;
   const cartItem = items.find((i) => i.productId === product.id);
   const inCart = !!cartItem;
 
@@ -96,10 +97,15 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link
         href={`/products/${product.id}`}
         className="group h-full block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
-        aria-label={`Ver detalhes do produto ${product.name}`}
+        aria-label={`Ver detalhes do produto ${product.name}${outOfStock ? ' (fora de estoque)' : ''}`}
         data-testid="product-card"
       >
-        <Card className="h-full flex flex-col overflow-hidden transition-all hover:shadow-lg dark:hover:shadow-zinc-800 p-0 border border-zinc-200 dark:border-zinc-800">
+        <Card className={cn(
+          'h-full flex flex-col overflow-hidden transition-all p-0 border',
+          outOfStock
+            ? 'border-zinc-200 dark:border-zinc-800 opacity-75'
+            : 'border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:shadow-[#9955E8]/10 dark:hover:shadow-[#9955E8]/20 hover:border-[#9955E8]/30 dark:hover:border-[#9955E8]/40',
+        )}>
           <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-b">
             {product.imageUrl ? (
               <div className="relative h-full w-full">
@@ -107,7 +113,10 @@ export function ProductCard({ product }: ProductCardProps) {
                   src={product.imageUrl}
                   alt={`Foto do produto ${product.name}`}
                   fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  className={cn(
+                    'object-cover transition-transform duration-300',
+                    outOfStock ? 'grayscale' : 'group-hover:scale-105',
+                  )}
                   onLoad={() => setImageLoaded(true)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
@@ -118,6 +127,15 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : (
               <div className="flex h-full items-center justify-center text-zinc-400" aria-hidden="true">
                 Sem imagem
+              </div>
+            )}
+
+            {outOfStock && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+                <div className="flex flex-col items-center gap-1.5 text-white">
+                  <PackageX className="h-8 w-8 drop-shadow" />
+                  <span className="text-sm font-semibold drop-shadow tracking-wide">Fora de Estoque</span>
+                </div>
               </div>
             )}
           </div>
@@ -139,19 +157,30 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <CardFooter className="pt-0 flex flex-col gap-2 mt-auto p-4">
             <div className="w-full flex flex-row justify-between items-center">
-              <span className="text-xl font-bold" aria-label={`Preço: ${priceFormatted}`}>
+              <span
+                className={cn('text-xl font-bold', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-[#9955E8]')}
+                aria-label={`Preço: ${priceFormatted}`}
+              >
                 {priceFormatted}
               </span>
-              <span
-                className="text-xs text-center font-medium px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full"
-                aria-label={`${product.stock} unidades em estoque`}
-              >
-                {product.stock} em estoque
-              </span>
+              {outOfStock ? (
+                <span
+                  className="text-xs font-medium px-2 py-1 bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-full"
+                  aria-label="Produto fora de estoque"
+                >
+                  Indisponível
+                </span>
+              ) : (
+                <span
+                  className="text-xs text-center font-medium px-2 py-1 bg-[#7BFFAF]/20 text-[#1A7A4A] dark:bg-[#7BFFAF]/15 dark:text-[#7BFFAF] rounded-full"
+                  aria-label={`${product.stock} unidades em estoque`}
+                >
+                  {product.stock} em estoque
+                </span>
+              )}
             </div>
 
-            {inCart ? (
-              /* Quantity controls — same h-9 height as the Button size="sm" */
+            {!outOfStock && inCart ? (
               <div
                 className="w-full h-9 flex items-center justify-between gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 animate-in fade-in-0 zoom-in-95 duration-200"
                 onClick={(e) => e.preventDefault()}
@@ -181,19 +210,21 @@ export function ProductCard({ product }: ProductCardProps) {
                 </button>
               </div>
             ) : (
-              /* Add to cart button */
               <Button
                 className={cn(
-                  'w-full gap-2 transition-all duration-300 h-9',
-                  justAdded && 'bg-green-600 hover:bg-green-600 scale-[0.98]',
+                  'w-full gap-2 transition-all duration-300 h-9 border-0',
+                  outOfStock
+                    ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'
+                    : 'bg-[#9955E8] text-white hover:bg-[#8040D4]',
+                  justAdded && 'bg-[#7BFFAF]! text-[#0F0B1A]! hover:bg-[#5EEEA0]! scale-[0.98]',
                 )}
                 size="sm"
-                disabled={product.stock === 0}
+                disabled={outOfStock}
                 onClick={handleAddToCart}
                 aria-label={
-                  product.stock > 0
-                    ? `Adicionar ${product.name} ao carrinho`
-                    : `${product.name} fora de estoque`
+                  outOfStock
+                    ? `${product.name} fora de estoque`
+                    : `Adicionar ${product.name} ao carrinho`
                 }
                 data-testid="add-to-cart-button"
               >
@@ -202,10 +233,15 @@ export function ProductCard({ product }: ProductCardProps) {
                     <Check className="h-4 w-4 animate-in zoom-in-75 duration-150" />
                     Adicionado!
                   </>
+                ) : outOfStock ? (
+                  <>
+                    <PackageX className="h-4 w-4" />
+                    Fora de Estoque
+                  </>
                 ) : (
                   <>
                     <ShoppingCart className="h-4 w-4" />
-                    {product.stock > 0 ? 'Adicionar ao Carrinho' : 'Fora de Estoque'}
+                    Adicionar ao Carrinho
                   </>
                 )}
               </Button>

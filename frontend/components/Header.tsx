@@ -47,16 +47,16 @@ export default function Header() {
 
   if (isAdmin) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ background: 'var(--brand-dark)' }}>
         <div className="container mx-auto px-6 md:px-8 flex h-16 max-w-7xl items-center justify-between">
-          <Link href="/" className="font-bold text-lg" aria-label="Marketplace - Ir para a página inicial">
+          <Link href="/" className="font-bold text-lg gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
             Marketplace
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-xs font-semibold bg-primary text-primary-foreground px-2 py-1 rounded">ADMIN</span>
+            <span className="text-xs font-semibold bg-[#9955E8] text-white px-2 py-1 rounded">ADMIN</span>
             <button
               onClick={handleLogout}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm font-medium text-white/60 hover:text-white transition-colors"
             >
               Sair
             </button>
@@ -68,32 +68,32 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ background: 'var(--brand-dark)' }}>
         <div className="container mx-auto px-6 md:px-8 h-16 max-w-7xl flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]">
           {/* Logo — esquerda */}
-          <Link href="/" className="font-bold text-lg md:justify-self-start" aria-label="Marketplace - Ir para a página inicial">
+          <Link href="/" className="font-bold text-lg md:justify-self-start gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
             Marketplace
           </Link>
 
           {/* Nav — centro (desktop only) */}
           <nav className="hidden md:flex items-center gap-6" aria-label="Menu Principal">
-            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
               Produtos
             </Link>
 
             {!loading && !user && (
               <>
-                <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
                   Entrar
                 </Link>
-                <Link href="/register" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link href="/register" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
                   Registrar
                 </Link>
               </>
             )}
 
             {!loading && user && user.role !== 'ADMIN' && (
-              <Link href="/orders" className="text-sm font-medium hover:text-primary transition-colors">
+              <Link href="/orders" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
                 Meus Pedidos
               </Link>
             )}
@@ -107,7 +107,7 @@ export default function Header() {
 
               {!loading && user && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity">
+                  <DropdownMenuTrigger className="flex items-center justify-center w-10 h-10 rounded-full bg-[#9955E8] text-white font-semibold text-sm cursor-pointer hover:bg-[#8040D4] transition-colors">
                     {initials}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -130,7 +130,7 @@ export default function Header() {
 
             {/* Hambúrguer (mobile) */}
             <button
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 transition-colors text-white"
               onClick={() => setMenuOpen((v) => !v)}
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuOpen}
@@ -145,17 +145,18 @@ export default function Header() {
       {mounted && menuOpen && createPortal(
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/40"
+            className="fixed inset-0 z-40 bg-black/60"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
           <nav
-            className="fixed top-16 left-0 right-0 z-41 bg-background border-b shadow-lg px-6 py-4 flex flex-col gap-1"
+            className="fixed top-16 left-0 right-0 z-41 border-b border-white/10 shadow-xl px-6 py-4 flex flex-col gap-1"
+            style={{ background: 'var(--brand-dark)' }}
             aria-label="Menu mobile"
           >
             <Link
               href="/"
-              className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+              className="py-3 text-sm font-medium border-b border-white/10 text-white/70 hover:text-white transition-colors"
             >
               Produtos
             </Link>
@@ -164,13 +165,13 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                  className="py-3 text-sm font-medium border-b border-white/10 text-white/70 hover:text-white transition-colors"
                 >
                   Entrar
                 </Link>
                 <Link
                   href="/register"
-                  className="py-3 text-sm font-medium hover:text-primary transition-colors"
+                  className="py-3 text-sm font-medium text-white/70 hover:text-white transition-colors"
                 >
                   Registrar
                 </Link>
@@ -180,7 +181,7 @@ export default function Header() {
             {!loading && user && user.role !== 'ADMIN' && (
               <Link
                 href="/orders"
-                className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                className="py-3 text-sm font-medium border-b border-white/10 text-white/70 hover:text-white transition-colors"
               >
                 Meus Pedidos
               </Link>
@@ -190,13 +191,13 @@ export default function Header() {
               <>
                 <Link
                   href="/profile"
-                  className="py-3 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                  className="py-3 text-sm font-medium border-b border-white/10 text-white/70 hover:text-white transition-colors"
                 >
                   Meu Perfil
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="py-3 text-sm font-medium text-left text-destructive hover:opacity-80 transition-opacity"
+                  className="py-3 text-sm font-medium text-left text-red-400 hover:text-red-300 transition-colors"
                 >
                   Sair
                 </button>

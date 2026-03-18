@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ShoppingCart, Plus, Minus, Check } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Minus, Check, PackageX } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { cn } from '@/lib/utils';
 import { ProductDetailSkeleton } from '@/components/skeletons/product-detail-skeleton';
@@ -27,6 +27,8 @@ function ProductDetailContent({ id }: { id: string }) {
       return failureCount < 3;
     },
   });
+
+  const outOfStock = product.stock === 0;
 
   const priceFormatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -56,7 +58,7 @@ function ProductDetailContent({ id }: { id: string }) {
                 src={product.imageUrl}
                 alt={`Foto do produto ${product.name}`}
                 fill
-                className="object-cover"
+                className={cn('object-cover', outOfStock && 'grayscale')}
                 priority
                 onLoad={() => setImageLoaded(true)}
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -70,14 +72,35 @@ function ProductDetailContent({ id }: { id: string }) {
               Sem imagem
             </div>
           )}
+
+          {outOfStock && (
+            <div className="absolute inset-0 flex items-end justify-start p-4 bg-gradient-to-t from-black/60 to-transparent">
+              <div className="flex items-center gap-2 text-white">
+                <PackageX className="h-5 w-5" />
+                <span className="text-sm font-semibold tracking-wide">Fora de Estoque</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col">
-          <Badge className="w-fit mb-4" variant="secondary">
-            {product.category}
-          </Badge>
+          <div className="flex items-center gap-2 mb-4">
+            <Badge className="w-fit" variant="secondary">
+              {product.category}
+            </Badge>
+            {outOfStock && (
+              <Badge variant="destructive" className="gap-1">
+                <PackageX className="h-3 w-3" />
+                Fora de Estoque
+              </Badge>
+            )}
+          </div>
           <h1 className="text-4xl font-bold mb-4" data-testid="product-name">{product.name}</h1>
-          <p className="text-2xl font-semibold mb-6 text-primary" aria-label={`Preço: ${priceFormatted}`} data-testid="product-price">
+          <p
+            className={cn('text-2xl font-semibold mb-6', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-primary')}
+            aria-label={`Preço: ${priceFormatted}`}
+            data-testid="product-price"
+          >
             {priceFormatted}
           </p>
 
@@ -91,16 +114,21 @@ function ProductDetailContent({ id }: { id: string }) {
           </div>
 
           <div className="mt-auto space-y-4">
-            <div className="flex items-center gap-2 text-sm text-zinc-500 mb-4">
-              <span className={`h-2 w-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} aria-hidden="true" />
-              {product.stock > 0 ? (
-                <span>{product.stock} unidades disponíveis em estoque</span>
+            <div className="flex items-center gap-2 text-sm mb-4">
+              <span className={cn('h-2 w-2 rounded-full', outOfStock ? 'bg-red-500' : 'bg-green-500')} aria-hidden="true" />
+              {outOfStock ? (
+                <span className="text-red-500 dark:text-red-400 font-medium">Produto fora de estoque</span>
               ) : (
-                <span className="text-red-500 font-medium">Produto fora de estoque</span>
+                <span className="text-zinc-500">{product.stock} unidades disponíveis em estoque</span>
               )}
             </div>
 
-            {(() => {
+            {outOfStock ? (
+              <div className="w-full h-14 flex items-center justify-center gap-3 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10 text-red-500 dark:text-red-400">
+                <PackageX className="h-5 w-5" />
+                <span className="font-medium">Indisponível no momento</span>
+              </div>
+            ) : (() => {
               const cartItem = items.find((i) => i.productId === product.id);
               if (cartItem) {
                 return (
@@ -136,7 +164,6 @@ function ProductDetailContent({ id }: { id: string }) {
                     'w-full text-lg h-14 shadow-lg shadow-primary/20 gap-2 transition-all duration-300',
                     justAdded && 'bg-green-600 hover:bg-green-600 scale-[0.99]',
                   )}
-                  disabled={product.stock === 0}
                   onClick={() => {
                     addItem({
                       productId: product.id,
@@ -148,7 +175,7 @@ function ProductDetailContent({ id }: { id: string }) {
                     setJustAdded(true);
                     setTimeout(() => setJustAdded(false), 1200);
                   }}
-                  aria-label={product.stock > 0 ? `Adicionar ${product.name} ao carrinho` : `Produto ${product.name} indisponível`}
+                  aria-label={`Adicionar ${product.name} ao carrinho`}
                   data-testid="add-to-cart-button"
                 >
                   {justAdded ? (

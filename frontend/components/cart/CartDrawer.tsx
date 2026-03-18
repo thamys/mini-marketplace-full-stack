@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/cart-context';
 import { useAuth } from '@/lib/auth-context';
 import { createOrder, getProductsStock, isInsufficientStockError, type InsufficientStockDetail } from '@/lib/api/orders';
@@ -31,6 +32,7 @@ export function CartDrawer() {
   const { items, totalItems, totalAmount, removeItem, updateQuantity, updateItemStock, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -92,6 +94,8 @@ export function CartDrawer() {
       });
       clearCart();
       setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Pedido realizado com sucesso!');
       router.push('/orders');
     } catch (err: unknown) {
@@ -175,14 +179,14 @@ export function CartDrawer() {
       {/* Cart trigger button */}
       <button
         onClick={handleOpen}
-        className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-primary outline-none"
+        className="relative inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/10 text-white transition-colors focus-visible:ring-2 focus-visible:ring-primary outline-none"
         aria-label={`Carrinho de compras${totalItems > 0 ? `, ${totalItems} item(s)` : ', vazio'}`}
         data-testid="cart-button"
       >
         <ShoppingCart className="h-5 w-5" />
         {totalItems > 0 && (
           <span
-            className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground animate-in zoom-in-75 duration-150"
+            className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#7BFFAF] text-[10px] font-bold text-[#0F0B1A] animate-in zoom-in-75 duration-150"
             aria-hidden="true"
           >
             {totalItems > 99 ? '99+' : totalItems}
@@ -349,12 +353,12 @@ export function CartDrawer() {
 
             <div className="flex items-center justify-between pt-2 border-t font-semibold">
               <span>Total</span>
-              <span className="text-base">{fmt.format(totalAmount)}</span>
+              <span className="text-base text-[#9955E8]">{fmt.format(totalAmount)}</span>
             </div>
 
             <Button
               size="lg"
-              className="w-full"
+              className="w-full bg-[#9955E8] border-0 text-white hover:bg-[#8040D4]"
               onClick={handlePlaceOrder}
               disabled={placing || checkingStock || hasConflicts}
               aria-label={hasConflicts ? 'Resolva os conflitos de estoque antes de finalizar' : user ? 'Finalizar pedido' : 'Entrar para finalizar pedido'}

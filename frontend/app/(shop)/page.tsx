@@ -74,7 +74,7 @@ export default function CatalogPage() {
   return (
     <div className="flex flex-col space-y-8" aria-labelledby="catalog-title">
         <div>
-          <h1 id="catalog-title" className="text-3xl font-bold tracking-tight">Catálogo de Produtos</h1>
+          <h1 id="catalog-title" className="text-3xl font-bold tracking-tight gradient-brand-text">Catálogo de Produtos</h1>
           <p className="text-muted-foreground mt-2 text-lg">
             Navegue por nossa seleção de ofertas incríveis.
           </p>
