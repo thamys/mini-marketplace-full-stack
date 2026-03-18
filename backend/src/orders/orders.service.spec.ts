@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
+import { OrderStatus } from '@prisma/client';
 
 const mockProduct = (
   overrides: Partial<{
@@ -39,6 +40,8 @@ describe('OrdersService', () => {
       },
       order: {
         findMany: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
       },
       $transaction: jest.fn(),
     };
@@ -219,6 +222,85 @@ describe('OrdersService', () => {
           where: { userId: 'user-1' },
           orderBy: { createdAt: 'desc' },
           include: { items: true },
+        }),
+      );
+    });
+  });
+
+  describe('TC-11.2.7: updateStatus() com ID válido', () => {
+    it('atualiza o status do pedido e retorna pedido com items', async () => {
+      const existingOrder = { id: 'order-1', userId: 'user-1', status: 'PENDING' };
+      const updatedOrder = {
+        id: 'order-1',
+        userId: 'user-1',
+        status: OrderStatus.COMPLETED,
+        items: [{ id: 'item-1', productName: 'Prod', quantity: 1, unitPrice: new Decimal(100) }],
+      };
+
+      const prismaAny = prisma as unknown as {
+        order: { findUnique: jest.Mock; update: jest.Mock };
+      };
+      prismaAny.order.findUnique.mockResolvedValue(existingOrder);
+      prismaAny.order.update.mockResolvedValue(updatedOrder);
+
+      const result = await service.updateStatus('order-1', OrderStatus.COMPLETED);
+
+      expect(result).toEqual(updatedOrder);
+      expect(prismaAny.order.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'order-1' },
+          data: { status: OrderStatus.COMPLETED },
+          include: { items: true },
+        }),
+      );
+    });
+  });
+
+  describe('TC-11.2.8: updateStatus() com ID inválido', () => {
+    it('lança NotFoundException quando pedido não existe e não chama order.update', async () => {
+      const prismaAny = prisma as unknown as {
+        order: { findUnique: jest.Mock; update: jest.Mock };
+      };
+      prismaAny.order.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateStatus('nonexistent-id', OrderStatus.COMPLETED),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(prismaAny.order.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('TC-11.2.9: findAll() retorna todos os pedidos com user info', () => {
+    it('inclui items e user em cada pedido, ordenados por createdAt desc', async () => {
+      const orders = [
+        {
+          id: 'order-2',
+          createdAt: new Date('2024-02-01'),
+          items: [],
+          user: { id: 'u-1', email: 'a@a.com', name: 'A' },
+        },
+        {
+          id: 'order-1',
+          createdAt: new Date('2024-01-01'),
+          items: [],
+          user: { id: 'u-2', email: 'b@b.com', name: 'B' },
+        },
+      ];
+
+      const prismaAny = prisma as unknown as { order: { findMany: jest.Mock } };
+      prismaAny.order.findMany.mockResolvedValue(orders);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual(orders);
+      expect(prismaAny.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { createdAt: 'desc' },
+          include: expect.objectContaining({
+            items: true,
+            user: { select: { id: true, email: true, name: true } },
+          }),
         }),
       );
     });
