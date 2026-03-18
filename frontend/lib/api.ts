@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 
 // Direct to backend - public routes
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  baseURL: (() => { const u = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'; return u.endsWith('/api') ? u : u.replace(/\/$/, '') + '/api'; })(),
   headers: {
     'Content-Type': 'application/json',
   },
