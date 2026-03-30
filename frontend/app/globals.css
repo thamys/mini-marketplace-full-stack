@@ -149,6 +149,12 @@
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -260,5 +266,16 @@
   /* Sombra do header ao rolar */
   .header-scrolled {
     box-shadow: 0 4px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Reset dialog default styles - Override browser defaults */
+  dialog {
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  dialog::backdrop {
+    display: none;
   }
 }
