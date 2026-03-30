@@ -45,7 +45,8 @@ test.describe('Register Page E2E', () => {
     });
 
     await page.goto('/register', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('Cadastro', { exact: true })).toBeVisible();
+    // Wait for the register page to load by checking for the submit button
+    await expect(page.getByTestId('register-submit')).toBeVisible();
   });
 
   test.fixme('TC-05: Successful Registration - Should display success toast and redirect to home', async ({ page }) => {
