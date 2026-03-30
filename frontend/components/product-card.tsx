@@ -101,10 +101,10 @@ export function ProductCard({ product }: ProductCardProps) {
         data-testid="product-card"
       >
         <Card className={cn(
-          'h-full flex flex-col overflow-hidden transition-all p-0 border',
+          'h-full flex flex-col overflow-hidden p-0 border',
           outOfStock
             ? 'border-zinc-200 dark:border-zinc-800 opacity-75'
-            : 'border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:shadow-[#9955E8]/10 dark:hover:shadow-[#9955E8]/20 hover:border-[#9955E8]/30 dark:hover:border-[#9955E8]/40',
+            : 'border-zinc-200 dark:border-zinc-800 card-lift',
         )}>
           <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-b">
             {product.imageUrl ? (
@@ -114,8 +114,8 @@ export function ProductCard({ product }: ProductCardProps) {
                   alt={`Foto do produto ${product.name}`}
                   fill
                   className={cn(
-                    'object-cover transition-transform duration-300',
-                    outOfStock ? 'grayscale' : 'group-hover:scale-105',
+                    'object-cover transition-transform duration-500 ease-out',
+                    outOfStock ? 'grayscale' : 'group-hover:scale-108',
                   )}
                   onLoad={() => setImageLoaded(true)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -144,7 +144,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-medium">
               {product.category}
             </div>
-            <h3 className="font-semibold text-lg line-clamp-2 leading-tight mt-1">
+            <h3 className="font-display font-semibold text-base sm:text-lg line-clamp-2 leading-tight mt-1 break-words">
               {product.name}
             </h3>
           </CardHeader>
@@ -158,7 +158,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <CardFooter className="pt-0 flex flex-col gap-2 mt-auto p-4">
             <div className="w-full flex flex-row justify-between items-center">
               <span
-                className={cn('text-xl font-bold', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-[#9955E8]')}
+                className={cn('text-xl font-bold font-display', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-[#9955E8]')}
                 aria-label={`Preço: ${priceFormatted}`}
               >
                 {priceFormatted}
@@ -215,8 +215,8 @@ export function ProductCard({ product }: ProductCardProps) {
                   'w-full gap-2 transition-all duration-300 h-9 border-0',
                   outOfStock
                     ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'
-                    : 'bg-[#9955E8] text-white hover:bg-[#8040D4]',
-                  justAdded && 'bg-[#7BFFAF]! text-[#0F0B1A]! hover:bg-[#5EEEA0]! scale-[0.98]',
+                    : 'bg-[#9955E8] text-white hover:bg-[#8040D4] btn-brand-shadow font-display',
+                  justAdded && 'bg-[#7BFFAF]! text-[#0F0B1A]! hover:bg-[#5EEEA0]! shadow-none!',
                 )}
                 size="sm"
                 disabled={outOfStock}

@@ -66,10 +66,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex items-center justify-center">
-      <Card className="w-full max-w-md">
+    <div className="flex items-center justify-center py-8"
+      style={{
+        backgroundImage: `radial-gradient(circle, rgba(153,85,232,0.07) 1px, transparent 1px)`,
+        backgroundSize: '24px 24px',
+      }}
+    >
+      <div className="w-full max-w-md animate-fade-up">
+        <div className="text-center mb-6">
+          <span className="font-display font-bold text-3xl gradient-brand-text">Marketplace</span>
+        </div>
+      <Card className="w-full shadow-[0_8px_40px_rgba(153,85,232,0.12),0_2px_8px_rgba(153,85,232,0.06)] border-[#9955E8]/10">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Cadastro</CardTitle>
+          <CardTitle className="font-display text-xl font-semibold text-center">Criar conta</CardTitle>
           <CardDescription className="text-center">
             Crie sua conta no Mini Marketplace
           </CardDescription>
@@ -123,22 +132,26 @@ export default function RegisterPage() {
                 </Alert>
               )}
 
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full bg-[#9955E8] border-0 text-white hover:bg-[#8040D4] btn-brand-shadow font-display"
                 disabled={mutation.isPending}
                 data-testid="register-submit"
               >
                 {mutation.isPending ? 'Cadastrando...' : 'Criar conta'}
               </Button>
 
-              <div className="text-center text-sm text-slate-500 mt-4">
-                Já tem uma conta? <Link href="/login" className="text-primary hover:underline">Entre aqui</Link>
+              <div className="text-center text-sm text-muted-foreground mt-4">
+                Já tem uma conta?{' '}
+                <Link href="/login" className="text-[#9955E8] hover:text-[#8040D4] font-medium transition-colors">
+                  Entre aqui
+                </Link>
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

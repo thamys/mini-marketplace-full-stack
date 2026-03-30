@@ -56,7 +56,7 @@ function ProductDetailContent({ id }: { id: string }) {
             <div className="relative h-full w-full">
               <Image
                 src={product.imageUrl}
-                alt={`Foto do produto ${product.name}`}
+                alt={product.name ? `Foto do produto ${product.name}` : 'Imagem do produto'}
                 fill
                 className={cn('object-cover', outOfStock && 'grayscale')}
                 priority
@@ -74,7 +74,7 @@ function ProductDetailContent({ id }: { id: string }) {
           )}
 
           {outOfStock && (
-            <div className="absolute inset-0 flex items-end justify-start p-4 bg-gradient-to-t from-black/60 to-transparent">
+            <div className="absolute inset-0 flex items-end justify-start p-4 bg-linear-to-t from-black/60 to-transparent">
               <div className="flex items-center gap-2 text-white">
                 <PackageX className="h-5 w-5" />
                 <span className="text-sm font-semibold tracking-wide">Fora de Estoque</span>
@@ -95,9 +95,9 @@ function ProductDetailContent({ id }: { id: string }) {
               </Badge>
             )}
           </div>
-          <h1 className="text-4xl font-bold mb-4" data-testid="product-name">{product.name}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-4 leading-tight" data-testid="product-name">{product.name}</h1>
           <p
-            className={cn('text-2xl font-semibold mb-6', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-primary')}
+            className={cn('font-display text-2xl sm:text-3xl font-bold mb-6', outOfStock ? 'text-zinc-400 dark:text-zinc-500' : 'text-[#9955E8]')}
             aria-label={`Preço: ${priceFormatted}`}
             data-testid="product-price"
           >
@@ -161,8 +161,8 @@ function ProductDetailContent({ id }: { id: string }) {
                 <Button
                   size="lg"
                   className={cn(
-                    'w-full text-lg h-14 shadow-lg shadow-primary/20 gap-2 transition-all duration-300',
-                    justAdded && 'bg-green-600 hover:bg-green-600 scale-[0.99]',
+                    'w-full font-display text-lg h-14 gap-2 transition-all duration-300 bg-[#9955E8] border-0 text-white hover:bg-[#8040D4] btn-brand-shadow',
+                    justAdded && 'bg-[#7BFFAF]! text-[#0F0B1A]! shadow-none! scale-[0.99]',
                   )}
                   onClick={() => {
                     addItem({

@@ -71,10 +71,10 @@ function OrderCard({ order }: { order: Order }) {
           <table className="w-full text-sm mt-4" aria-label="Itens do pedido">
             <thead>
               <tr className="text-left text-muted-foreground border-b">
-                <th className="pb-2 font-medium">Produto</th>
-                <th className="pb-2 font-medium text-center w-20">Qtd.</th>
-                <th className="pb-2 font-medium text-right">Preço un.</th>
-                <th className="pb-2 font-medium text-right">Subtotal</th>
+                <th scope="col" className="pb-2 font-medium">Produto</th>
+                <th scope="col" className="pb-2 font-medium text-center w-20">Qtd.</th>
+                <th scope="col" className="pb-2 font-medium text-right">Preço un.</th>
+                <th scope="col" className="pb-2 font-medium text-right">Subtotal</th>
               </tr>
             </thead>
             <tbody>

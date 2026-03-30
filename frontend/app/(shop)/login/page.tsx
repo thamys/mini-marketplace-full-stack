@@ -65,11 +65,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="flex items-center justify-center py-8"
+      style={{
+        backgroundImage: `radial-gradient(circle, rgba(153,85,232,0.07) 1px, transparent 1px)`,
+        backgroundSize: '24px 24px',
+      }}
+    >
+      <div className="w-full max-w-md animate-fade-up">
+        <div className="text-center mb-6">
+          <span className="font-display font-bold text-3xl gradient-brand-text">Marketplace</span>
+        </div>
+      <Card className="w-full shadow-[0_8px_40px_rgba(153,85,232,0.12),0_2px_8px_rgba(153,85,232,0.06)] border-[#9955E8]/10">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold flex justify-center">Marketplace</CardTitle>
-          <CardDescription>Entre com suas credenciais para acessar o marketplace</CardDescription>
+          <CardTitle className="font-display text-xl font-semibold flex justify-center">Bem-vindo de volta</CardTitle>
+          <CardDescription className="text-center">Entre com suas credenciais para acessar o marketplace</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -118,21 +127,22 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={mutation.isPending} data-testid="login-submit">
+              <Button type="submit" className="w-full bg-[#9955E8] border-0 text-white hover:bg-[#8040D4] btn-brand-shadow font-display" disabled={mutation.isPending} data-testid="login-submit">
                 {mutation.isPending ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Não tem uma conta?{' '}
-            <Link href="/register" className="text-primary hover:underline font-medium">
+            <Link href="/register" className="text-[#9955E8] hover:text-[#8040D4] font-medium transition-colors">
               Cadastrar-se
             </Link>
           </p>
         </CardFooter>
       </Card>
+      </div>
     </div>
   );
 }

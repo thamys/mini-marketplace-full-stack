@@ -31,26 +31,26 @@ export default function Footer() {
         <div className="hidden md:grid md:grid-cols-3 gap-8 mb-8">
           <div>
             <h3 className="font-semibold text-lg mb-4 gradient-brand-text">Marketplace</h3>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-white/70">
               Um projeto portfolio full-stack que demonstra práticas modernas de desenvolvimento web.
             </p>
           </div>
 
           <nav aria-label="Links Rápidos">
-            <h4 className="font-semibold mb-4 text-white/80">Links Rápidos</h4>
+            <h4 className="font-semibold mb-4 text-white/90">Links Rápidos</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-white/50 hover:text-[#7BFFAF] transition-colors">
+                <Link href="/" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Produtos
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="text-white/50 hover:text-[#7BFFAF] transition-colors">
+                <Link href="/login" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Entrar
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="text-white/50 hover:text-[#7BFFAF] transition-colors">
+                <Link href="/register" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Registrar
                 </Link>
               </li>
@@ -58,14 +58,14 @@ export default function Footer() {
           </nav>
 
           <nav aria-label="Conecte-se">
-            <h4 className="font-semibold mb-4 text-white/80">Conecte-se</h4>
+            <h4 className="font-semibold mb-4 text-white/90">Conecte-se</h4>
             <div className="flex gap-4">
               <a
                 href="https://github.com/thamys"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/50 hover:text-[#7BFFAF] transition-colors"
-                aria-label="GitHub"
+                className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+                aria-label="Visite meu perfil no GitHub"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -73,8 +73,8 @@ export default function Footer() {
                 href="https://linkedin.com/in/thamysferreira"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/50 hover:text-[#7BFFAF] transition-colors"
-                aria-label="LinkedIn"
+                className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+                aria-label="Conecte-se comigo no LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
@@ -90,8 +90,8 @@ export default function Footer() {
               href="https://github.com/thamys"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/50 hover:text-[#7BFFAF] transition-colors"
-              aria-label="GitHub"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+              aria-label="Visite meu perfil no GitHub"
             >
               <Github className="w-5 h-5" />
             </a>
@@ -99,8 +99,8 @@ export default function Footer() {
               href="https://linkedin.com/in/thamysferreira"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/50 hover:text-[#7BFFAF] transition-colors"
-              aria-label="LinkedIn"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+              aria-label="Conecte-se comigo no LinkedIn"
             >
               <Linkedin className="w-5 h-5" />
             </a>
@@ -108,13 +108,13 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-4 md:pt-6">
-          <p className="text-xs text-white/40 text-center">
+          <p className="text-xs text-white/60 text-center">
             © {currentYear} Projeto Portfolio.{' '}
             <Link
               href="https://github.com/thamys"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#7BFFAF] transition-colors underline underline-offset-2"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors underline underline-offset-2"
             >
               Ver no GitHub
             </Link>

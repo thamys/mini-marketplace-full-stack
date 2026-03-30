@@ -58,7 +58,7 @@ export function Pagination({ totalPages, currentPage }: { totalPages: number, cu
 
       {pages.map((page, i) =>
         page === null ? (
-          <span key={`ellipsis-${i}`} className="w-9 text-center text-zinc-400 select-none">
+          <span key={`ellipsis-${i}`} className="w-9 text-center text-zinc-400 select-none" aria-label="Mais páginas">
             …
           </span>
         ) : (

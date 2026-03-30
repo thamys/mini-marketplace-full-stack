@@ -31,8 +31,15 @@ export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => { setMounted(true); }, []);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Fecha menu ao navegar
   React.useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -47,9 +54,12 @@ export default function Header() {
 
   if (isAdmin) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ background: 'var(--brand-dark)' }}>
+      <header
+        className={`sticky top-0 z-50 w-full border-b border-white/10 transition-shadow duration-300 ${scrolled ? 'header-scrolled' : ''}`}
+        style={{ background: 'var(--brand-dark)' }}
+      >
         <div className="container mx-auto px-6 md:px-8 flex h-16 max-w-7xl items-center justify-between">
-          <Link href="/" className="font-bold text-lg gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
+          <Link href="/" className="font-display font-bold text-lg gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
             Marketplace
           </Link>
           <div className="flex items-center gap-4">
@@ -68,10 +78,13 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ background: 'var(--brand-dark)' }}>
+      <header
+        className={`sticky top-0 z-50 w-full border-b border-white/10 transition-shadow duration-300 ${scrolled ? 'header-scrolled' : ''}`}
+        style={{ background: 'var(--brand-dark)' }}
+      >
         <div className="container mx-auto px-6 md:px-8 h-16 max-w-7xl flex items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr]">
           {/* Logo — esquerda */}
-          <Link href="/" className="font-bold text-lg md:justify-self-start gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
+          <Link href="/" className="font-display font-bold text-lg md:justify-self-start gradient-brand-text" aria-label="Marketplace - Ir para a página inicial">
             Marketplace
           </Link>
 
