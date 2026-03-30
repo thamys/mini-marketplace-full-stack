@@ -125,7 +125,10 @@ export class OrdersService {
       throw new NotFoundException(`Order ${orderId} not found`);
     }
 
-    if (status === OrderStatus.CANCELLED && order.status !== OrderStatus.CANCELLED) {
+    if (
+      status === OrderStatus.CANCELLED &&
+      order.status !== OrderStatus.CANCELLED
+    ) {
       return this.prisma.$transaction(async (tx) => {
         for (const item of order.items) {
           await tx.product.update({
