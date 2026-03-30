@@ -52,7 +52,6 @@ describe('ProductsService', () => {
   describe('findAll', () => {
     it('TC-08.2.1: Sem filtros → retorna { data, meta } com paginação correta', async () => {
       (prisma.product.findMany as jest.Mock).mockResolvedValue([mockProduct]);
-      (prisma.product.count as jest.Mock).mockResolvedValue(1);
 
       const result = await service.findAll({ page: 1, limit: 100 });
 
@@ -62,15 +61,12 @@ describe('ProductsService', () => {
       });
       expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith({
         where: {},
-        skip: 0,
-        take: 100,
         orderBy: { createdAt: 'desc' },
       });
     });
 
     it('TC-08.2.2: search=notebook → retorna apenas produtos com notebook no nome', async () => {
       (prisma.product.findMany as jest.Mock).mockResolvedValue([mockProduct]);
-      (prisma.product.count as jest.Mock).mockResolvedValue(1);
 
       await service.findAll({ search: 'notebook', page: 1, limit: 100 });
 
@@ -83,7 +79,6 @@ describe('ProductsService', () => {
 
     it('TC-08.2.3: category=eletronicos → filtra por categoria', async () => {
       (prisma.product.findMany as jest.Mock).mockResolvedValue([mockProduct]);
-      (prisma.product.count as jest.Mock).mockResolvedValue(1);
 
       await service.findAll({ category: 'eletronicos', page: 1, limit: 100 });
 
@@ -95,17 +90,23 @@ describe('ProductsService', () => {
     });
 
     it('TC-08.2.4: page=2&limit=5 → retorna a segunda página com no máximo 5 itens', async () => {
-      (prisma.product.findMany as jest.Mock).mockResolvedValue([]);
-      (prisma.product.count as jest.Mock).mockResolvedValue(10);
+      // Create 10 mock products
+      const mockProducts = Array.from({ length: 10 }, (_, i) => ({
+        ...mockProduct,
+        id: `${i + 1}`,
+        name: `Product ${i + 1}`,
+        stock: 10,
+      }));
+      (prisma.product.findMany as jest.Mock).mockResolvedValue(mockProducts);
 
       const result = await service.findAll({ page: 2, limit: 5 });
 
-      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skip: 5,
-          take: 5,
-        }),
-      );
+      // Implementation fetches all products then slices in-memory
+      expect(prisma.product.findMany as jest.Mock).toHaveBeenCalledWith({
+        where: {},
+        orderBy: { createdAt: 'desc' },
+      });
+      expect(result.data.length).toBe(5); // Second page has 5 items
       expect(result.meta).toEqual({
         total: 10,
         page: 2,
@@ -115,8 +116,14 @@ describe('ProductsService', () => {
     });
 
     it('TC-08.2.5: meta.total reflete o total real de registros', async () => {
-      (prisma.product.findMany as jest.Mock).mockResolvedValue([]);
-      (prisma.product.count as jest.Mock).mockResolvedValue(55);
+      // Create 55 mock products
+      const mockProducts = Array.from({ length: 55 }, (_, i) => ({
+        ...mockProduct,
+        id: `${i + 1}`,
+        name: `Product ${i + 1}`,
+        stock: 10,
+      }));
+      (prisma.product.findMany as jest.Mock).mockResolvedValue(mockProducts);
 
       const result = await service.findAll({ page: 1, limit: 10 });
 

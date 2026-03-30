@@ -6,7 +6,7 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 
 const toSlug = (str: string) =>
-  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, '-');
+  str.normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '').toLowerCase().replaceAll(/\s+/g, '-');
 
 export function SearchFilters() {
   const router = useRouter();
@@ -54,32 +54,45 @@ export function SearchFilters() {
   return (
     <div className="flex flex-col gap-4 w-full md:w-auto">
       <div className="flex w-full max-w-sm items-center space-x-2">
-        <Input 
-          type="search" 
-          placeholder="Buscar produtos..." 
+        <label htmlFor="search-input" className="sr-only">Buscar produtos</label>
+        <Input
+          id="search-input"
+          type="search"
+          placeholder="Buscar produtos..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-[300px]"
           data-testid="search-input"
+          aria-label="Buscar produtos por nome ou descrição"
         />
       </div>
-      
-      <div className="flex flex-wrap gap-2">
-        <Button 
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar produtos por categoria">
+        <Button
           variant={currentCategory === '' ? 'default' : 'outline'}
           size="sm"
           onClick={() => handleFilterChange('category', '')}
           data-testid="category-filter-all"
+          className={
+            currentCategory === ''
+              ? 'bg-[#9955E8] border-0 text-white hover:bg-[#8040D4] font-display shadow-[0_2px_10px_rgba(153,85,232,0.35)] transition-all duration-200'
+              : 'font-display border-[#9955E8]/20 hover:border-[#9955E8]/50 hover:text-[#9955E8] transition-all duration-200'
+          }
         >
           Todos
         </Button>
         {categories.map((cat) => (
-          <Button 
+          <Button
             key={cat}
             variant={currentCategory === cat ? 'default' : 'outline'}
             size="sm"
             onClick={() => handleFilterChange('category', cat)}
             data-testid={`category-filter-${toSlug(cat)}`}
+            className={
+              currentCategory === cat
+                ? 'bg-[#9955E8] border-0 text-white hover:bg-[#8040D4] font-display shadow-[0_2px_10px_rgba(153,85,232,0.35)] transition-all duration-200'
+                : 'font-display border-[#9955E8]/20 hover:border-[#9955E8]/50 hover:text-[#9955E8] transition-all duration-200'
+            }
           >
             {cat}
           </Button>

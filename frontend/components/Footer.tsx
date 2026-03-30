@@ -14,9 +14,9 @@ export default function Footer() {
 
   if (isAdmin) {
     return (
-      <footer className="border-t bg-background px-8 py-4">
-        <div className="container max-w-screen-2xl flex justify-center">
-          <p className="text-xs text-muted-foreground">
+      <footer className="w-full" style={{ background: 'var(--brand-dark)' }}>
+        <div className="container mx-auto max-w-7xl px-6 md:px-8 py-4 flex justify-center">
+          <p className="text-xs text-white/40">
             © {currentYear} Marketplace. Todos os direitos reservados.
           </p>
         </div>
@@ -25,31 +25,32 @@ export default function Footer() {
   }
 
   return (
-    <footer className="border-t bg-background px-8">
-      <div className="container max-w-screen-2xl py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+    <footer className="w-full" style={{ background: 'var(--brand-dark)' }}>
+      <div className="container mx-auto max-w-7xl px-6 md:px-8 py-6 md:py-8">
+        {/* Desktop: 3 colunas */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="font-semibold text-lg mb-4">Marketplace</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold text-lg mb-4 gradient-brand-text">Marketplace</h3>
+            <p className="text-sm text-white/70">
               Um projeto portfolio full-stack que demonstra práticas modernas de desenvolvimento web.
             </p>
           </div>
 
           <nav aria-label="Links Rápidos">
-            <h4 className="font-semibold mb-4">Links Rápidos</h4>
+            <h4 className="font-semibold mb-4 text-white/90">Links Rápidos</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Produtos
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/login" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Entrar
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/register" className="text-white/70 hover:text-[#7BFFAF] transition-colors underline-offset-4 hover:underline">
                   Registrar
                 </Link>
               </li>
@@ -57,14 +58,14 @@ export default function Footer() {
           </nav>
 
           <nav aria-label="Conecte-se">
-            <h4 className="font-semibold mb-4">Conecte-se</h4>
+            <h4 className="font-semibold mb-4 text-white/90">Conecte-se</h4>
             <div className="flex gap-4">
               <a
                 href="https://github.com/thamys"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="GitHub"
+                className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+                aria-label="Visite meu perfil no GitHub"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -72,8 +73,8 @@ export default function Footer() {
                 href="https://linkedin.com/in/thamysferreira"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="LinkedIn"
+                className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+                aria-label="Conecte-se comigo no LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
@@ -81,14 +82,39 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="border-t pt-8">
-          <p className="text-xs text-muted-foreground text-center">
-            © {currentYear} Projeto Portfolio. Este é um projeto full-stack de desenvolvimento web construído para demonstrar padrões arquiteturais modernos e melhores práticas.{' '}
+        {/* Mobile: simplificado */}
+        <div className="flex md:hidden items-center justify-between mb-4">
+          <span className="font-semibold gradient-brand-text">Marketplace</span>
+          <div className="flex gap-4">
+            <a
+              href="https://github.com/thamys"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+              aria-label="Visite meu perfil no GitHub"
+            >
+              <Github className="w-5 h-5" />
+            </a>
+            <a
+              href="https://linkedin.com/in/thamysferreira"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors focus-visible:ring-2 focus-visible:ring-[#7BFFAF] rounded p-1 -m-1"
+              aria-label="Conecte-se comigo no LinkedIn"
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 pt-4 md:pt-6">
+          <p className="text-xs text-white/60 text-center">
+            © {currentYear} Projeto Portfolio.{' '}
             <Link
               href="https://github.com/thamys"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors underline"
+              className="text-white/70 hover:text-[#7BFFAF] transition-colors underline underline-offset-2"
             >
               Ver no GitHub
             </Link>

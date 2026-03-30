@@ -119,10 +119,31 @@ export class OrdersService {
   async updateStatus(orderId: string, status: OrderStatus) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
+      include: { items: true },
     });
     if (!order) {
       throw new NotFoundException(`Order ${orderId} not found`);
     }
+
+    if (
+      status === OrderStatus.CANCELLED &&
+      order.status !== OrderStatus.CANCELLED
+    ) {
+      return this.prisma.$transaction(async (tx) => {
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+        return tx.order.update({
+          where: { id: orderId },
+          data: { status },
+          include: { items: true },
+        });
+      });
+    }
+
     return this.prisma.order.update({
       where: { id: orderId },
       data: { status },

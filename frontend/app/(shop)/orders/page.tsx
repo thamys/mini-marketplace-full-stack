@@ -71,10 +71,10 @@ function OrderCard({ order }: { order: Order }) {
           <table className="w-full text-sm mt-4" aria-label="Itens do pedido">
             <thead>
               <tr className="text-left text-muted-foreground border-b">
-                <th className="pb-2 font-medium">Produto</th>
-                <th className="pb-2 font-medium text-center w-20">Qtd.</th>
-                <th className="pb-2 font-medium text-right">Preço un.</th>
-                <th className="pb-2 font-medium text-right">Subtotal</th>
+                <th scope="col" className="pb-2 font-medium">Produto</th>
+                <th scope="col" className="pb-2 font-medium text-center w-20">Qtd.</th>
+                <th scope="col" className="pb-2 font-medium text-right">Preço un.</th>
+                <th scope="col" className="pb-2 font-medium text-right">Subtotal</th>
               </tr>
             </thead>
             <tbody>
@@ -156,7 +156,7 @@ export default function OrdersPage() {
   const { user, loading } = useAuth();
 
   return (
-    <main className="container mx-auto py-8 px-4 md:px-6 max-w-3xl" aria-labelledby="orders-title">
+    <main aria-labelledby="orders-title">
       <div className="mb-8">
         <h1 id="orders-title" className="text-3xl font-bold tracking-tight">Meus Pedidos</h1>
         <p className="text-muted-foreground mt-2">Histórico de compras realizadas.</p>

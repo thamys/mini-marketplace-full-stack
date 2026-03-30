@@ -9,8 +9,10 @@ export default function ShopLayout({
   return (
     <>
       <Header />
-      <main id="main-content" className="flex-1 focus:outline-none" tabIndex={-1}>
-        {children}
+      <main id="main-content" className="flex-1 focus:outline-2 focus:outline-primary focus:-outline-offset-2" tabIndex={-1}>
+        <div className="container max-w-7xl mx-auto px-6 md:px-8 py-8">
+          {children}
+        </div>
       </main>
       <Footer />
     </>
